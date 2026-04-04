@@ -1,0 +1,47 @@
+# NEOWATT Technoeconomic Model — Global Parameters
+# These apply across all use cases unless overridden.
+
+global:
+  launch_cost_per_kg:
+    value: 5000
+    unit: "$/kg"
+    description: "Current rideshare launch cost (Falcon 9 class)"
+    distribution:
+      type: triangular
+      low: 2500
+      mode: 5000
+      high: 8000
+
+  discount_rate:
+    value: 0.10
+    unit: "fraction"
+    description: "Annual discount rate for NPV calculations"
+    distribution:
+      type: triangular
+      low: 0.06
+      mode: 0.10
+      high: 0.15
+
+  required_margin_over_incumbent: 0.50
+  go_threshold: 0.60
+  marginal_threshold: 0.30
+  default_n_simulations: 10000
+
+  # Cost trajectories for "Why Now?" analysis
+  launch_cost_trajectory:
+    years: [2025, 2027, 2030, 2035]
+    values: [5000, 3500, 2000, 1000]
+    unit: "$/kg"
+    description: "Projected launch cost decline driven by Starship, reusability"
+
+  laser_cost_trajectory:
+    years: [2025, 2027, 2030, 2035]
+    values: [50, 30, 15, 8]
+    unit: "$/W"
+    description: "Projected laser diode cost decline (telecom/industrial drivers)"
+
+  photovoltaic_efficiency_trajectory:
+    years: [2025, 2027, 2030, 2035]
+    values: [0.35, 0.40, 0.45, 0.50]
+    unit: "fraction"
+    description: "Projected PV cell efficiency improvement for laser wavelengths"
