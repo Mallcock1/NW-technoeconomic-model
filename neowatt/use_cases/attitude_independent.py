@@ -15,7 +15,7 @@ class AttitudeIndependentModel(UseCaseModel):
 
     def compute_costs(self, n, rng):
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         tx_hw = sample(cost["tx_hardware_k"], n, rng) * 1000
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
@@ -39,7 +39,7 @@ class AttitudeIndependentModel(UseCaseModel):
     def compute_our_price_per_unit(self, n, rng):
         # Customer cost = RX hardware + RX launch (one-time)
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
         rx_launch = sample(cost["rx_mass_kg"], n, rng) * launch_cost
         return rx_hw + rx_launch

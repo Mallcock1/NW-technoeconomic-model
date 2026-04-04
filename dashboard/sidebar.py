@@ -4,39 +4,35 @@ import streamlit as st
 
 
 def render_sidebar(use_cases: dict, global_params: dict) -> dict:
-    """Render sidebar controls and return settings dict.
-
-    Returns dict with keys: n_simulations, launch_cost, required_margin,
-    selected_slug, overrides.
-    """
+    """Render sidebar controls and return settings dict."""
     gp = global_params["global"]
 
     with st.sidebar:
-        st.markdown("### Global Parameters")
+        st.markdown("## ⚡ NEOWATT")
+        st.markdown("#### Technoeconomic Analysis")
+        st.caption("Space power beaming · Use case prioritisation · Monte Carlo analysis")
 
-        n_sim = st.slider(
-            "Monte Carlo simulations",
-            1000, 50000,
-            gp.get("default_n_simulations", 10000),
-            step=1000,
+        with st.expander("About", expanded=False):
+            st.markdown(
+                "This dashboard evaluates **12 use cases** for space power beaming technology. "
+                "For each use case, a technoeconomic model computes costs, revenues, and customer "
+                "savings vs the incumbent solution. **Point Estimates** give a quick deterministic "
+                "view; **Monte Carlo** propagates uncertainty through every input parameter to "
+                "produce probability distributions on viability."
+            )
+
+        st.divider()
+        st.markdown("### Analysis Mode")
+        mode = st.radio(
+            "Mode",
+            ["Point Estimates", "Monte Carlo"],
+            horizontal=True,
+            label_visibility="collapsed",
         )
-
-        launch_cost_val = gp["launch_cost_per_kg"]["value"]
-        launch_cost = st.slider(
-            "Launch cost ($/kg)",
-            1000, 20000, int(launch_cost_val), step=500,
-        )
-
-        req_margin = st.slider(
-            "Required margin over incumbent (%)",
-            10, 80,
-            int(gp.get("required_margin_over_incumbent", 0.50) * 100),
-        ) / 100
 
         st.divider()
         st.markdown("### Select Use Case")
 
-        # Build name -> slug mapping
         slug_names = {}
         for slug, uc in use_cases.items():
             name = uc["meta"]["name"]
@@ -44,63 +40,51 @@ def render_sidebar(use_cases: dict, global_params: dict) -> dict:
 
         selected_name = st.selectbox("Use case to detail", list(slug_names.keys()))
         selected_slug = slug_names[selected_name]
-        selected_uc = use_cases[selected_slug]
 
         st.divider()
-        st.markdown("### Override Parameters")
+        st.markdown("### Global Parameters")
 
-        overrides = {}
+        req_margin = st.slider(
+            "Required margin over incumbent (%)",
+            0, 1000,
+            int(gp.get("required_margin_over_incumbent", 0.50) * 100),
+        ) / 100
 
-        # Power delivered
-        tech = selected_uc.get("technical", {})
-        if "power_delivered_W" in tech:
-            power_val = tech["power_delivered_W"]["value"]
-            power = st.number_input("Power delivered (W)", value=int(power_val), step=100)
-            if power != power_val:
-                overrides.setdefault("technical", {})["power_delivered_W"] = power
+        # MC-only: simulation count
+        n_sim = gp.get("default_n_simulations", 10000)
+        if mode == "Monte Carlo":
+            n_sim = st.slider(
+                "Monte Carlo simulations",
+                10, 100000,
+                n_sim,
+                step=10,
+            )
 
-        # Link efficiency
-        if "link_efficiency" in tech:
-            eff_val = tech["link_efficiency"]["value"]
-            eff = st.slider("Link efficiency", 0.01, 0.50, float(eff_val), step=0.01)
-            if eff != eff_val:
-                overrides.setdefault("technical", {})["link_efficiency"] = eff
+        # Time dependency
+        st.divider()
+        st.markdown("### Time Dependency")
+        time_dependent = st.toggle("Enable time-dependent parameters", value=False)
 
-        # WTP (varies by model type)
-        econ = selected_uc.get("economic", {})
-        if "wtp_per_W" in econ:
-            wtp_val = econ["wtp_per_W"]["value"]
-            wtp = st.number_input("WTP ($/W)", value=float(wtp_val), step=10.0)
-            if wtp != wtp_val:
-                overrides.setdefault("economic", {})["wtp_per_W"] = wtp
-        elif "wtp_per_kWh" in econ:
-            wtp_val = econ["wtp_per_kWh"]["value"]
-            wtp = st.number_input("WTP ($/kWh)", value=float(wtp_val), step=10.0)
-            if wtp != wtp_val:
-                overrides.setdefault("economic", {})["wtp_per_kWh"] = wtp
-        elif "revenue_per_year_k" in econ:
-            rev_val = econ["revenue_per_year_k"]["value"]
-            rev = st.number_input("Revenue ($k/yr)", value=float(rev_val), step=100.0)
-            if rev != rev_val:
-                overrides.setdefault("economic", {})["revenue_per_year_k"] = rev
-        elif "subscription_price_k_yr" in econ:
-            sub_val = econ["subscription_price_k_yr"]["value"]
-            sub = st.number_input("Subscription ($k/yr)", value=float(sub_val), step=10.0)
-            if sub != sub_val:
-                overrides.setdefault("economic", {})["subscription_price_k_yr"] = sub
+        year_start = 2025
+        year_end = 2035
+        year_step = 1
 
-        # Incumbent cost
-        inc = selected_uc.get("incumbent", {})
-        if "cost_per_W" in inc:
-            inc_val = inc["cost_per_W"]["value"]
-            inc_cost = st.number_input("Incumbent cost ($/W)", value=float(inc_val), step=10.0)
-            if inc_cost != inc_val:
-                overrides.setdefault("incumbent", {})["cost_per_W"] = inc_cost
+        if time_dependent:
+            year_range = st.slider(
+                "Year range",
+                2025, 2040,
+                (2025, 2035),
+            )
+            year_start, year_end = year_range
+            year_step = st.selectbox("Year step", [1, 2, 5], index=0)
 
     return {
+        "mode": mode,
         "n_simulations": n_sim,
-        "launch_cost": launch_cost,
         "required_margin": req_margin,
         "selected_slug": selected_slug,
-        "overrides": {selected_slug: overrides} if overrides else {},
+        "time_dependent": time_dependent,
+        "year_start": year_start,
+        "year_end": year_end,
+        "year_step": year_step,
     }

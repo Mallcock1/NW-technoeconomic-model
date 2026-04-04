@@ -16,7 +16,7 @@ class PeakPowerModel(UseCaseModel):
 
     def compute_costs(self, n, rng):
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         tx_hw = sample(cost["tx_hardware_k"], n, rng) * 1000
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
@@ -65,18 +65,3 @@ class PeakPowerModel(UseCaseModel):
         power_W = sample(tech["power_delivered_W"], n, rng)
         return np.where(power_W > 0, total_cost_to_customer / power_W, np.inf)
 
-    def compute_market_size(self, n, rng):
-        econ = self.params["economic"]
-        tech = self.params["technical"]
-        wtp = get_param_value(econ["wtp_per_kWh"])
-        power_kW = get_param_value(tech["power_delivered_W"]) / 1000.0
-        burst = get_param_value(tech["burst_duration_hrs"])
-        events = get_param_value(tech["events_per_year"])
-        addressable = get_param_value(econ["addressable_units"])
-        penetration = get_param_value(econ["penetration_rate"])
-
-        annual_rev_per_cust = wtp * power_kW * burst * events
-        tam = annual_rev_per_cust * addressable / 1000  # $k
-        sam = tam * 0.3
-        som = tam * penetration
-        return {"tam_k": tam, "sam_k": sam, "som_k": som}

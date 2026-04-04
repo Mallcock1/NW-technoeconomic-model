@@ -33,9 +33,6 @@ class ModelResult:
     # Scalars
     p_viable: float = 0.0
     decision: Decision = None
-    tam_k: float = 0.0
-    sam_k: float = 0.0
-    som_k: float = 0.0
 
     @property
     def gross_margin_median(self) -> float:
@@ -77,8 +74,8 @@ class UseCaseModel(ABC):
         """Compute CAPEX and annual OPEX arrays.
 
         Returns:
-            capex: shape (n,) — one-time capital expenditure
-            annual_opex: shape (n,) — annual operating expenditure
+            capex: shape (n,) – one-time capital expenditure
+            annual_opex: shape (n,) – annual operating expenditure
         """
 
     @abstractmethod
@@ -92,19 +89,6 @@ class UseCaseModel(ABC):
     @abstractmethod
     def compute_our_price_per_unit(self, n: int, rng: np.random.Generator) -> np.ndarray:
         """Compute our price to the customer per unit ($/W). Shape (n,)."""
-
-    def compute_market_size(self, n: int, rng: np.random.Generator) -> dict:
-        """Compute TAM/SAM/SOM. Override in subclasses for custom logic."""
-        econ = self.params.get("economic", {})
-        wtp_val = get_param_value(econ.get("wtp_per_W", {"value": 0}))
-        power_val = get_param_value(self.params.get("technical", {}).get("power_delivered_W", {"value": 0}))
-        addressable = get_param_value(econ.get("addressable_units", {"value": 0}))
-        penetration = get_param_value(econ.get("penetration_rate", {"value": 0.05}))
-
-        tam = wtp_val * power_val * addressable / 1000  # $k
-        sam = tam * 0.3  # assume 30% serviceable
-        som = tam * penetration
-        return {"tam_k": tam, "sam_k": sam, "som_k": som}
 
     def run(self, n: int, rng: np.random.Generator, required_margin: float) -> ModelResult:
         """Run Monte Carlo simulation and return results."""
@@ -158,9 +142,6 @@ class UseCaseModel(ABC):
         decision = decide(p_viable, float(np.median(gross_margin)),
                           go_thresh, marg_thresh, self.incumbent_type)
 
-        # Market size
-        market = self.compute_market_size(n, rng)
-
         return ModelResult(
             use_case_slug=self.slug,
             use_case_name=self.name,
@@ -176,7 +157,4 @@ class UseCaseModel(ABC):
             cost_per_W=cost_per_W,
             p_viable=p_viable,
             decision=decision,
-            tam_k=market["tam_k"],
-            sam_k=market["sam_k"],
-            som_k=market["som_k"],
         )

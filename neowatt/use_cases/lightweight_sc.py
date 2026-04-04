@@ -16,7 +16,7 @@ class LightweightSCModel(UseCaseModel):
 
     def compute_costs(self, n, rng):
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         tx_hw = sample(cost["tx_hardware_k"], n, rng) * 1000
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
@@ -31,7 +31,7 @@ class LightweightSCModel(UseCaseModel):
 
     def compute_annual_revenue(self, n, rng):
         tech = self.params["technical"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         # Value from mass savings
         mass_saved = sample(tech["mass_saved_kg"], n, rng)
@@ -52,7 +52,7 @@ class LightweightSCModel(UseCaseModel):
     def compute_our_price_per_unit(self, n, rng):
         # Our effective cost per kg saved
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
         mass_saved = sample(self.params["technical"]["mass_saved_kg"], n, rng)
 
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000

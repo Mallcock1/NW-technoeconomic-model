@@ -8,6 +8,15 @@ from dashboard.styles import COLORS, decision_emoji
 from neowatt.use_case_model import ModelResult
 
 
+def _esc_prose(text: str) -> str:
+    """Escape lone dollar signs in prose text without breaking $$ LaTeX blocks."""
+    if not text:
+        return text
+    import re
+    # Replace single $ not adjacent to another $ with escaped version
+    return re.sub(r'(?<!\$)\$(?!\$)', r'\\$', text).replace("~", "\\~")
+
+
 def render_deep_dive(result: ModelResult, uc_params: dict, required_margin: float):
     dec = result.decision
     st.markdown(f"## {decision_emoji(dec.label)} Deep Dive: {result.use_case_name}")
@@ -25,7 +34,7 @@ def render_deep_dive(result: ModelResult, uc_params: dict, required_margin: floa
     if model_prose or model_maths:
         with st.expander("Model explanation", expanded=True):
             if model_prose:
-                st.markdown(model_prose)
+                st.markdown(_esc_prose(model_prose))
             if model_maths:
                 st.divider()
                 st.markdown(model_maths)

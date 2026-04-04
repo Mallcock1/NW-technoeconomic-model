@@ -16,7 +16,7 @@ class PowerAsServiceModel(UseCaseModel):
 
     def compute_costs(self, n, rng):
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         tx_hw = sample(cost["tx_hardware_k"], n, rng) * 1000
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
@@ -50,13 +50,3 @@ class PowerAsServiceModel(UseCaseModel):
         amort = get_param_value(self.params["economic"]["amortization_years"])
         return sub * amort
 
-    def compute_market_size(self, n, rng):
-        econ = self.params["economic"]
-        sub = get_param_value(econ["subscription_price_k_yr"])
-        addressable = get_param_value(econ["addressable_units"])
-        penetration = get_param_value(econ["penetration_rate"])
-
-        tam = sub * addressable  # $k
-        sam = tam * 0.3
-        som = tam * penetration
-        return {"tam_k": tam, "sam_k": sam, "som_k": som}

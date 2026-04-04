@@ -41,6 +41,7 @@ def render_market_size(results: dict[str, ModelResult]):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(13,17,23,1)",
         yaxis_title="Market size ($M)",
+        yaxis_type="log",
         font_family="Syne",
         height=400,
         margin=dict(t=10, b=10),
@@ -51,7 +52,7 @@ def render_market_size(results: dict[str, ModelResult]):
 
 
 def render_why_now(trajectory: dict, use_case_name: str):
-    st.markdown(f"### Why Now? — {use_case_name}")
+    st.markdown(f"### Why Now? – {use_case_name}")
     st.caption("How does viability evolve as launch costs decline?")
 
     if not trajectory or not trajectory.get("years"):

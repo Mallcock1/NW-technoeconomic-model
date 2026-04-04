@@ -10,14 +10,13 @@ import numpy as np
 
 from neowatt.use_case_model import UseCaseModel
 from neowatt.distributions import sample
-from neowatt.data_loader import get_param_value
 
 
 class LifeExtensionModel(UseCaseModel):
 
     def compute_costs(self, n, rng):
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         tx_hw = sample(cost["tx_hardware_k"], n, rng) * 1000
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
@@ -42,15 +41,3 @@ class LifeExtensionModel(UseCaseModel):
         # Our annual service price
         return sample(self.params["economic"]["revenue_per_year_k"], n, rng) * 1000
 
-    def compute_market_size(self, n, rng):
-        econ = self.params["economic"]
-        tech = self.params["technical"]
-        rev = get_param_value(econ["revenue_per_year_k"])
-        years_ext = get_param_value(tech["years_extended"])
-        addressable = get_param_value(econ["addressable_units"])
-        penetration = get_param_value(econ["penetration_rate"])
-
-        tam = rev * years_ext * addressable  # $k
-        sam = tam * 0.3
-        som = tam * penetration
-        return {"tam_k": tam, "sam_k": sam, "som_k": som}

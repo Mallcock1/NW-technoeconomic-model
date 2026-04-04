@@ -18,47 +18,51 @@ def why_now_analysis(
 ) -> dict:
     """Compute P(viable) trajectory over time as costs decline.
 
-    Uses launch_cost_trajectory and laser_cost_trajectory from global_params
-    to project how viability evolves from 2025 to 2035.
+    Uses launch_cost_trajectory from global_params to project how viability
+    evolves from 2025 to 2035. Modifies the use case's economic.launch_cost_per_kg.
 
-    Returns dict with 'years' and 'p_viable' lists.
+    Returns dict with 'years', 'p_viable', and 'cost_per_W_median' lists.
     """
     trajectories = {}
     gp = global_params["global"]
 
-    # Collect all trajectories
     for key in ["launch_cost_trajectory", "laser_cost_trajectory", "photovoltaic_efficiency_trajectory"]:
         if key in gp:
             t = gp[key]
             trajectories[key] = dict(zip(t["years"], t["values"]))
 
-    # Get all unique years
     all_years = sorted(set(
         year for t in trajectories.values() for year in t.keys()
     ))
 
+    # Get the base launch cost from the use case's economic params
+    uc_params = use_cases[slug]
+    base_lc_spec = uc_params.get("economic", {}).get("launch_cost_per_kg", {})
+    base_lc = base_lc_spec.get("value", 5000)
+
     results = {"years": [], "p_viable": [], "cost_per_W_median": []}
 
     for year in all_years:
-        modified_gp = copy.deepcopy(global_params)
+        modified_cases = copy.deepcopy(use_cases)
 
-        # Update launch cost if trajectory exists
+        # Update launch cost in the use case's economic params
         if "launch_cost_trajectory" in trajectories:
             t = trajectories["launch_cost_trajectory"]
             if year in t:
                 lc = t[year]
-                modified_gp["global"]["launch_cost_per_kg"]["value"] = lc
-                d = modified_gp["global"]["launch_cost_per_kg"].get("distribution", {})
-                if d:
-                    ratio = lc / global_params["global"]["launch_cost_per_kg"]["value"]
-                    if "low" in d:
-                        d["low"] = d["low"] * ratio
-                    if "mode" in d:
-                        d["mode"] = lc
-                    if "high" in d:
-                        d["high"] = d["high"] * ratio
+                lc_spec = modified_cases[slug]["economic"]["launch_cost_per_kg"]
+                ratio = lc / base_lc if base_lc > 0 else 1.0
+                lc_spec["value"] = lc
+                dist = lc_spec.get("distribution", {})
+                if dist:
+                    if "low" in dist:
+                        dist["low"] = dist["low"] * ratio
+                    if "mode" in dist:
+                        dist["mode"] = lc
+                    if "high" in dist:
+                        dist["high"] = dist["high"] * ratio
 
-        r = run_single_use_case(slug, use_cases, modified_gp, n_simulations, seed)
+        r = run_single_use_case(slug, modified_cases, global_params, n_simulations, seed)
         results["years"].append(year)
         results["p_viable"].append(r.p_viable)
         results["cost_per_W_median"].append(r.cost_per_W_median)

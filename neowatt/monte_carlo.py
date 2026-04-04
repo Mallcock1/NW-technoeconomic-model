@@ -95,8 +95,10 @@ def run_single_use_case(
 def _apply_overrides(uc_params: dict, overrides: dict) -> dict:
     """Deep-merge overrides into use case params.
 
-    overrides format: {param_group: {param_name: new_value}}
-    e.g. {"economic": {"wtp_per_W": 300}} overrides the base value.
+    overrides format: {param_group: {param_name: new_value_or_spec}}
+    new_value can be:
+      - a scalar (e.g. 300): overrides just the base value
+      - a dict with 'value' and optionally 'distribution': replaces entire spec
     """
     if not overrides:
         return uc_params
@@ -108,10 +110,20 @@ def _apply_overrides(uc_params: dict, overrides: dict) -> dict:
         if group not in params:
             continue
         for param_name, new_value in group_overrides.items():
-            if param_name in params[group]:
-                if isinstance(params[group][param_name], dict):
-                    params[group][param_name]["value"] = new_value
+            if param_name not in params[group]:
+                continue
+            existing = params[group][param_name]
+            if isinstance(new_value, dict) and "value" in new_value:
+                # Full spec override (from MC inputs view)
+                if isinstance(existing, dict):
+                    existing["value"] = new_value["value"]
+                    if "distribution" in new_value:
+                        existing["distribution"] = new_value["distribution"]
                 else:
+                    params[group][param_name] = new_value["value"]
+            elif isinstance(existing, dict):
+                existing["value"] = new_value
+            else:
                     params[group][param_name] = new_value
 
     return params

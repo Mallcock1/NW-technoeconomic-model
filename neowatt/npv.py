@@ -13,7 +13,7 @@ def npv(cashflows: np.ndarray, discount_rate: np.ndarray) -> np.ndarray:
         discount_rate: shape (n_sim,). Annual discount rate per simulation.
 
     Returns:
-        shape (n_sim,) — NPV for each simulation.
+        shape (n_sim,) – NPV for each simulation.
     """
     n_sim, n_years = cashflows.shape
     years = np.arange(n_years)  # [0, 1, 2, ...]
@@ -27,13 +27,13 @@ def build_cashflows(capex: np.ndarray, annual_revenue: np.ndarray,
     """Build a cashflow matrix from CAPEX, annual revenue, and annual OPEX.
 
     Args:
-        capex: shape (n_sim,) — upfront capital cost (positive = cost, will be negated)
-        annual_revenue: shape (n_sim,) — annual revenue
-        annual_opex: shape (n_sim,) — annual operating cost (positive = cost, will be negated)
+        capex: shape (n_sim,) – upfront capital cost (positive = cost, will be negated)
+        annual_revenue: shape (n_sim,) – annual revenue
+        annual_opex: shape (n_sim,) – annual operating cost (positive = cost, will be negated)
         n_years: number of years including year 0
 
     Returns:
-        shape (n_sim, n_years) — net cashflow per year
+        shape (n_sim, n_years) – net cashflow per year
     """
     n_sim = capex.shape[0]
     cf = np.zeros((n_sim, n_years), dtype=np.float64)
@@ -46,11 +46,11 @@ def levelized_cost(total_cost_npv: np.ndarray, total_power_delivered: np.ndarray
     """Compute levelized cost per watt delivered.
 
     Args:
-        total_cost_npv: shape (n_sim,) — NPV of all costs
-        total_power_delivered: shape (n_sim,) — total watts delivered over lifetime
+        total_cost_npv: shape (n_sim,) – NPV of all costs
+        total_power_delivered: shape (n_sim,) – total watts delivered over lifetime
 
     Returns:
-        shape (n_sim,) — $/W levelized
+        shape (n_sim,) – $/W levelized
     """
     return np.where(total_power_delivered > 0,
                     total_cost_npv / total_power_delivered,

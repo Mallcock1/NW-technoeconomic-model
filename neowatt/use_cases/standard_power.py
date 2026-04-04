@@ -1,5 +1,5 @@
 """
-Standard power delivery model — shared by LEO Eclipse, Shadow, HAPS, Lunar Night, In-Orbit Servicing.
+Standard power delivery model – shared by LEO Eclipse, Shadow, HAPS, Lunar Night, In-Orbit Servicing.
 
 Revenue = power_delivered * wtp_per_W (annual, based on duty cycle and availability)
 Cost = TX hardware + RX hardware + launch + ground segment + annual ops
@@ -18,7 +18,7 @@ class StandardPowerModel(UseCaseModel):
 
     def compute_costs(self, n, rng):
         cost = self.params["cost"]
-        launch_cost = sample(self.global_params["global"]["launch_cost_per_kg"], n, rng)
+        launch_cost = sample(self.params["economic"]["launch_cost_per_kg"], n, rng)
 
         tx_hw = sample(cost["tx_hardware_k"], n, rng) * 1000
         rx_hw = sample(cost["rx_hardware_k"], n, rng) * 1000
