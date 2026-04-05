@@ -363,7 +363,9 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
         items.append("RX Manufacturing"); vals.append(rx_hw_val); colors.append(COLORS["primary"])
 
     # Only show launch costs for service models (NEOWATT pays launch)
-    if not is_hardware_sale:
+    model_cls = meta["model_class"]
+    is_hw_sale = model_cls in ("HardwareSaleModel", "HardwarePVFreeModel", "HardwareCovertModel")
+    if not is_hw_sale:
         tx_launch_val = get_param_value(cost_data.get("tx_mass_kg", {"value": 0})) * lc
         items.append("TX Launch"); vals.append(tx_launch_val); colors.append(COLORS["primary"])
 
