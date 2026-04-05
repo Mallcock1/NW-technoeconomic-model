@@ -3,12 +3,22 @@ use_cases:
     meta:
       name: HAPS Power (Terrestrial)
       slug: haps_power
-      description: 'Customer: HAPS platform operators (Airbus Zephyr, BAE PHASA-35, SoftBank HAPSMobile). Problem: HAPS endurance
-        is limited by overnight battery capacity and seasonal solar variation. Solution: NEOWATT sells a ground-based TX unit
-        that the customer installs at their ground station, plus a lightweight RX module integrated on the HAPS platform.
-        Architecture: the ground TX is just equipment the HAPS operator buys and installs -- no satellite involved. This is
-        NEOWATT''s terrestrial wedge market with lowest technical risk. The HAPS operator runs the whole system; NEOWATT provides
-        hardware and support.'
+      description: 'Problem: High Altitude Pseudo-Satellites (HAPS) at ~20km altitude provide persistent surveillance and
+        communications but are limited by overnight battery capacity. Seasonal solar variation further constrains endurance
+        at high latitudes.
+
+
+        Who has it: HAPS platform operators such as Airbus (Zephyr), BAE Systems (PHASA-35), and SoftBank (HAPSMobile).
+
+
+        Current solution: Onboard lightweight solar cells charge batteries during the day to power the platform overnight.
+        This limits flight duration, payload power, and operational latitude range.
+
+
+        Proposed solution: A ground-based NEOWATT laser transmitter beams power up to a lightweight PV receiver on the HAPS
+        at ~20km altitude. Short range through thin upper atmosphere gives high link efficiency. The HAPS operator buys and
+        installs the ground TX and airborne RX as equipment -- no satellite involved. This is NEOWATT''s terrestrial wedge
+        market with lowest technical risk.'
       category: Power Delivery
       time_horizon: Near-term
       model_class: HardwareSaleModel
@@ -286,12 +296,22 @@ use_cases:
     meta:
       name: LEO Duty Cycle Extension
       slug: leo_duty_cycle_extension
-      description: 'Customer: LEO satellite operators (Earth observation, comms, IoT constellations). Problem: satellites
-        lose power during eclipse (~35% of each orbit), forcing battery oversizing and reduced duty cycles. Solution: NEOWATT
-        sells a TX payload that the customer integrates on one satellite in their constellation, plus RX modules for the satellites
-        that receive power. The customer operates both sides within their own constellation. Architecture: constellation operators
-        already have their own satellites and orbital planes -- they do not want a third-party satellite in their formation.
-        Hardware sale is the natural model.'
+      description: 'Problem: LEO satellites spend ~35% of each orbit in Earth''s shadow (eclipse). During eclipse they run
+        on batteries only, which limits the duty cycle of power-hungry payloads and forces operators to oversize solar arrays
+        and battery packs.
+
+
+        Who has it: LEO satellite operators running Earth observation, communications, and IoT constellations (e.g. Planet,
+        Spire, Capella, OneWeb).
+
+
+        Current solution: Larger solar arrays to charge batteries faster during sunlight, and oversized battery packs to sustain
+        operations through eclipse. This adds mass, cost, and failure modes.
+
+
+        Proposed solution: NEOWATT sells a TX payload that the customer integrates on one satellite in their constellation,
+        plus RX modules for the satellites that receive power during eclipse. The customer operates both sides within their
+        own constellation -- they do not want a third-party satellite in their orbital plane.'
       category: Power Delivery
       time_horizon: Near-term
       model_class: HardwareSaleModel
@@ -593,12 +613,22 @@ use_cases:
     meta:
       name: Peak Power on Demand
       slug: peak_power
-      description: 'Customer: satellite operators needing burst power for SAR imaging, laser comms, electric propulsion, or
-        electronic warfare. Problem: satellites must size solar arrays and batteries for peak demand even though peaks are
-        infrequent. Solution: NEOWATT sells a TX payload and RX modules that the customer integrates within their own constellation
-        or co-manifested assets. The customer schedules burst power delivery using their own mission planning. Architecture:
-        same rationale as LEO Duty Cycle Extension -- the customer operates both sides and does not want third-party satellites
-        in their orbit.'
+      description: 'Problem: Many satellite operations require burst power far exceeding average consumption -- SAR radar
+        imaging (kW-class pulses), laser communication links, electric propulsion burns, or electronic warfare. Satellites
+        must size their power systems for these peaks even though they occur infrequently.
+
+
+        Who has it: Operators of SAR, laser comms, electric propulsion, and EW satellites where peak-to-average power ratio
+        is high.
+
+
+        Current solution: Oversized solar arrays and large battery packs designed for worst-case peak demand. Most of this
+        capacity sits idle most of the time, wasting mass and cost.
+
+
+        Proposed solution: NEOWATT sells a TX payload and RX modules that the customer integrates within their own constellation
+        or on co-manifested assets. The customer schedules burst power delivery through their own mission planning system.
+        Hardware sale -- the customer operates both sides.'
       category: Power Delivery
       time_horizon: Near-term
       model_class: HardwareSaleModel
@@ -880,12 +910,21 @@ use_cases:
     meta:
       name: Satellite Life Extension
       slug: satellite_life_extension
-      description: 'Customer: GEO communications satellite operators (Intelsat, SES, Eutelsat). Problem: GEO satellites generating
-        $50-200M/yr revenue are retired when solar array degradation reduces power below operational thresholds. Solution:
-        NEOWATT operates a TX satellite co-located in GEO with the ageing customer satellite, beaming supplemental power to
-        restore capacity. Architecture: the ageing satellite cannot be modified (already in orbit, no RX pre-integrated).
-        NEOWATT must operate its own co-located TX satellite and sell power delivery as a service. The customer may not even
-        be the original satellite manufacturer. Service model is the only option.'
+      description: 'Problem: GEO communications satellites generating $50-200M/year in revenue are retired after ~15 years
+        when solar array degradation reduces available power below minimum operational thresholds. The satellite bus, transponders,
+        and orbital slot often have remaining useful life.
+
+
+        Who has it: GEO satellite operators such as Intelsat, SES, Eutelsat, and Telesat.
+
+
+        Current solution: Either launch a full replacement satellite ($200-500M) or contract a Northrop Grumman MEV docking
+        service (~$13M/year) that physically attaches to the satellite to provide station-keeping thrust.
+
+
+        Proposed solution: NEOWATT operates its own TX satellite, co-located in GEO with the ageing customer satellite, beaming
+        supplemental power to restore operational capacity. The ageing satellite cannot be modified (already in orbit), so
+        NEOWATT must operate the TX as a service. The customer pays an annual service fee.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: LifeExtensionModel
@@ -1139,12 +1178,22 @@ use_cases:
     meta:
       name: Onboard Power Delivery
       slug: onboard_power_delivery
-      description: 'Customer: operators of orbital robotic systems -- truss assembly robots, free-flying inspection drones,
-        construction manipulators, refuelling vehicles. Problem: each robot needs its own solar arrays and batteries, or must
-        be physically tethered via power cabling. Solution: NEOWATT sells a TX unit that mounts on the host spacecraft or
-        structure, and RX modules for each robot. The customer builds the host structure and integrates everything. Architecture:
-        the customer is building the host structure (e.g. orbital station, truss) and buying robots -- they purchase TX and
-        RX as components, not as a service.'
+      description: 'Problem: Robotic systems in orbit -- truss assembly robots, free-flying inspection drones, construction
+        manipulators -- each need their own solar arrays and batteries, adding mass and failure modes. Alternatively, they
+        must be physically tethered to a power bus via cabling, which constrains range of motion and assembly geometry.
+
+
+        Who has it: Operators of orbital stations, large structures, and in-space manufacturing facilities that deploy robotic
+        systems (e.g. future Axiom station, Orbital Reef, truss construction).
+
+
+        Current solution: Each robot carries its own small solar panels and batteries, or is connected by power cables to
+        the host structure. Both approaches limit operational flexibility.
+
+
+        Proposed solution: NEOWATT sells a TX unit that mounts on the host spacecraft or structure, and compact RX modules
+        for each robot. Robots operate untethered with wireless power. The customer builds the host structure and buys TX
+        and RX as components.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: HardwareSaleModel
@@ -1407,12 +1456,22 @@ use_cases:
     meta:
       name: PV-Free Spacecraft
       slug: array_free_spacecraft
-      description: 'Customer: LEO constellation operators (OneWeb, Kuiper) and precision-pointing missions (Earth observation,
-        astronomy). Problem: deployable solar arrays add mass, volume, drag, and collision risk, and force a Sun-pointing
-        constraint. Solution: NEOWATT sells a TX payload and RX modules. The customer designs their new satellite without
-        solar arrays, using the RX as the primary power input. The TX is integrated on a companion satellite or shared platform.
-        Architecture: this is a design-phase decision -- the customer commits when specifying their new satellite. They buy
-        and integrate the hardware themselves.'
+      description: 'Problem: Deployable solar arrays are a major mass, volume, and cost driver for satellites. They increase
+        aerodynamic drag and collision cross-section in LEO. They also force a Sun-pointing constraint that competes with
+        payload pointing, and introduce low-frequency structural vibrations that degrade imaging quality.
+
+
+        Who has it: LEO constellation operators launching hundreds of satellites (OneWeb, Kuiper), and precision-pointing
+        missions in Earth observation and astronomy where array-induced vibrations are a real problem.
+
+
+        Current solution: Accept the mass, drag, and pointing penalties of deployable arrays. Use SADA mechanisms and structural
+        stiffening to mitigate vibrations. Design around the Sun-pointing constraint.
+
+
+        Proposed solution: Customer designs their new satellite without solar arrays, using a NEOWATT RX as the primary power
+        input. NEOWATT sells a TX payload for a companion satellite and RX modules for the array-free spacecraft. This is
+        a design-phase commitment -- the customer buys and integrates the hardware themselves.'
       category: Spacecraft Design
       time_horizon: Mid-term
       model_class: HardwarePVFreeModel
@@ -1696,12 +1755,22 @@ use_cases:
     meta:
       name: Power-as-a-Service Platform
       slug: power_as_service
-      description: 'Customer: new space entrants, hosted payload operators, and capital-constrained satellite programmes.
-        Problem: every satellite must build its own solar arrays and batteries, a major CAPEX item. Solution: NEOWATT operates
-        a multi-customer TX satellite in LEO. Each customer integrates a small RX and pays an annual subscription. Architecture:
-        this is a utility model by definition -- NEOWATT owns and operates the power infrastructure, customers subscribe.
-        One TX platform serves multiple customer satellites via beam steering. NEOWATT sells the RX modules but operates the
-        TX.'
+      description: 'Problem: Every satellite must build its own solar arrays and batteries -- a major CAPEX item that adds
+        to development cost, delays schedules, and increases financial risk. Small companies and new space entrants are particularly
+        burdened.
+
+
+        Who has it: New space entrants, university satellite programmes, hosted payload operators, and capital-constrained
+        missions that would benefit from shifting power system CAPEX to OPEX.
+
+
+        Current solution: Each satellite programme designs, procures, and integrates its own power subsystem. No shared power
+        infrastructure exists.
+
+
+        Proposed solution: NEOWATT operates a multi-customer TX satellite in LEO. Each customer integrates a small, standardised
+        RX module and pays an annual power subscription. One TX platform serves multiple customer satellites via beam steering.
+        NEOWATT owns the TX infrastructure; customers avoid power system CAPEX entirely.'
       category: Economic
       time_horizon: Mid-term
       model_class: PowerAsServiceModel
@@ -1955,12 +2024,22 @@ use_cases:
     meta:
       name: Lunar and Deep-Space Night Power
       slug: lunar_deep_space_night
-      description: 'Customer: lunar surface mission operators (NASA Artemis, ESA, ispace, Astrobotic) and deep-space missions.
-        Problem: the 14-day lunar night and permanently shadowed craters have no sunlight. Solution: NEOWATT operates a TX
-        satellite on a lunar orbiter or crater-rim relay station, beaming power to surface assets during darkness. Architecture:
-        the lunar orbiter relay is shared infrastructure serving multiple surface missions over many years. It is more efficient
-        for NEOWATT to operate one relay than for each lander operator to launch their own. Service model with per-watt pricing.
-        Customer integrates a dust-resistant RX on their lander/rover.'
+      description: 'Problem: The 14-day lunar night and permanently shadowed crater regions (e.g. lunar south pole) receive
+        no sunlight. Surface missions must either hibernate for two weeks per month or carry nuclear power sources (RTGs),
+        which are extremely expensive, export-controlled, and limited by global Pu-238 supply.
+
+
+        Who has it: Lunar surface mission operators -- NASA Artemis base camp, ESA lunar missions, commercial landers (ispace,
+        Astrobotic, Intuitive Machines), and future ISRU operations.
+
+
+        Current solution: RTGs ($1000-4000/W) for critical missions, or mission hibernation (accepting 14 days of no operations
+        per month). Most commercial landers simply do not survive the first lunar night.
+
+
+        Proposed solution: NEOWATT operates a TX satellite on a lunar orbiter or crater-rim relay station, beaming power to
+        surface assets during darkness. The relay serves multiple surface missions over many years. Customers integrate a
+        dust-resistant RX on their lander or rover and pay per watt of delivered power.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
@@ -2204,11 +2283,22 @@ use_cases:
     meta:
       name: Debris Laser Ablation
       slug: debris_laser_ablation
-      description: 'Customer: space agencies, constellation operators, and insurance providers facing debris collision risk.
-        Problem: ~30,000 tracked debris objects threaten orbital infrastructure; no cost-effective removal solution exists.
-        Solution: NEOWATT operates a high-power laser satellite in LEO that ablates debris surfaces to generate deorbit thrust.
-        Architecture: there is no customer satellite -- the target is uncooperative debris. NEOWATT must own and operate the
-        laser platform and sell removal contracts. Government/agency customers pay per object removed.'
+      description: 'Problem: Approximately 30,000 tracked debris objects larger than 10cm threaten operational satellites
+        and crewed spacecraft. Collision risk is growing as more satellites launch. No cost-effective removal solution exists
+        at scale -- current approaches (capture and deorbit) cost $100M+ per object.
+
+
+        Who has it: Space agencies responsible for orbital safety (ESA, NASA), constellation operators facing collision risk
+        (SpaceX Starlink, OneWeb), and insurance providers pricing debris risk.
+
+
+        Current solution: Collision avoidance manoeuvres (costly in fuel), tracking and alerting (does not remove debris),
+        or accepting the risk. ESA''s ClearSpace-1 capture mission costs ~$100M for a single object.
+
+
+        Proposed solution: NEOWATT operates a high-power laser satellite in LEO. The laser ablates the surface of debris objects,
+        creating a small jet of vaporised material that generates thrust to lower the orbit for natural re-entry. Contactless,
+        no receiver needed, and one platform can engage multiple objects.'
       category: Active Debris Removal
       time_horizon: Mid-term
       model_class: DebrisAblationModel
@@ -2446,12 +2536,22 @@ use_cases:
     meta:
       name: Remote Power Delivery
       slug: remote_power_delivery
-      description: 'Customer: orbital compute providers (Axiom, Varda, OrbitsEdge), modular satellite operators. Problem:
-        current spacecraft tightly couple solar arrays with payload -- when payload becomes obsolete (compute chips every
-        3-5 years), arrays are wasted. Solution: NEOWATT operates a long-lived solar generation platform that beams power
-        to short-lived consumer modules in a nearby orbit. Architecture: the whole value proposition is decoupled infrastructure
-        with mismatched lifetimes. NEOWATT must operate the long-lived generation platform (15+ years) while customers swap
-        in/out consumer modules every 3-5 years. Service model is essential to the architecture.'
+      description: 'Problem: Current spacecraft tightly couple power generation (solar arrays) with power consumption (payload).
+        When the payload becomes obsolete -- compute chips every 3-5 years, sensors every 5-7 years -- the still-functional
+        solar arrays are deorbited and wasted. Conversely, when arrays degrade, a perfectly good payload loses power prematurely.
+
+
+        Who has it: Orbital compute providers (Axiom, Varda, OrbitsEdge), modular satellite operators, and any architecture
+        where power generation and consumption have mismatched lifetimes.
+
+
+        Current solution: Each payload module carries its own co-located solar arrays, discarded when the payload is refreshed.
+        Arrays are rebuilt and relaunched with every new generation.
+
+
+        Proposed solution: NEOWATT operates a long-lived (~15 year) solar generation platform that beams power to short-lived
+        consumer modules in a nearby orbit. Consumer modules carry only a lightweight RX and payload -- no arrays. When the
+        payload is refreshed, the power infrastructure stays.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
@@ -2692,11 +2792,24 @@ use_cases:
     meta:
       name: Covert Spacecraft
       slug: covert_spacecraft
-      description: 'Customer: defence and intelligence agencies (MOD, DoD, allied nations). Problem: solar arrays are the
-        dominant contributor to a satellite''s radar cross-section and optical brightness. Solution: NEOWATT sells TX and
-        RX hardware that the customer integrates on their own classified spacecraft. Architecture: defence customers will
-        not allow a third-party startup to operate power infrastructure for their classified assets. They buy hardware, integrate
-        it themselves, and operate it under their own security protocols. Hardware sale with a defence premium on pricing.'
+      description: 'Problem: Solar arrays are the dominant contributor to a satellite''s radar cross-section (RCS) and optical
+        brightness, making military and intelligence satellites detectable and trackable. Current stealth measures are limited
+        and compromise mission performance.
+
+
+        Who has it: Defence and intelligence agencies (UK MOD, US DoD, allied nations) operating reconnaissance, signals intelligence,
+        and strategic communications satellites.
+
+
+        Current solution: Radar-absorbing coatings (limited effectiveness), orbit selection to minimise observation windows
+        (constrains mission design), and operational timing constraints (reduces availability). These mitigations are partial
+        and come at mission cost.
+
+
+        Proposed solution: NEOWATT sells TX and RX hardware that the defence customer integrates on their own classified spacecraft.
+        The spacecraft operates without solar arrays, dramatically reducing RCS and optical signature. Defence customers will
+        not allow a third-party to operate power for classified assets -- they buy hardware and operate under their own security
+        protocols.'
       category: Defence
       time_horizon: Long-term
       model_class: HardwareCovertModel

@@ -319,11 +319,17 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
 
     st.markdown(f"### {decision_emoji(e['decision'])} {e['name']}")
 
-    # Model explanation
+    # Use case description
+    uc_description = meta.get("description", "")
+    if uc_description:
+        with st.expander("Use case description", expanded=False):
+            st.markdown(_esc_prose(uc_description))
+
+    # Model details
     model_prose = meta.get("model_prose", "")
     model_maths = meta.get("model_maths", "")
     if model_prose or model_maths:
-        with st.expander("Model details", expanded=True):
+        with st.expander("Model details", expanded=False):
             if model_prose:
                 st.markdown(_esc_prose(model_prose))
             if model_maths:

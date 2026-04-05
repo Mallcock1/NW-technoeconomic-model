@@ -21,18 +21,22 @@ def render_deep_dive(result: ModelResult, uc_params: dict, required_margin: floa
     dec = result.decision
     st.markdown(f"## {decision_emoji(dec.label)} {result.use_case_name} – Output Distributions")
 
-    # Description and incumbent
     meta = uc_params["meta"]
     inc = uc_params["incumbent"]
     st.caption(f"**Category:** {result.category} | **Horizon:** {result.time_horizon} | "
                f"**Incumbent:** {inc.get('name', 'N/A')}")
 
-    # Model explanation (prose + maths from YAML)
+    # Use case description
+    uc_description = meta.get("description", "")
+    if uc_description:
+        with st.expander("Use case description", expanded=False):
+            st.markdown(_esc_prose(uc_description))
+
+    # Model details
     model_prose = meta.get("model_prose", "")
     model_maths = meta.get("model_maths", "")
-
     if model_prose or model_maths:
-        with st.expander("Model details", expanded=True):
+        with st.expander("Model details", expanded=False):
             if model_prose:
                 st.markdown(_esc_prose(model_prose))
             if model_maths:
