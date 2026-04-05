@@ -3,53 +3,60 @@ use_cases:
     meta:
       name: Peak Power on Demand
       slug: peak_power
-      description: 'Burst power delivery for high-demand operations: SAR imaging, laser comms, orbital manoeuvres, electronic
-        warfare.'
+      description: 'Customer: satellite operators needing burst power for SAR imaging, laser comms, electric propulsion, or
+        electronic warfare. Problem: satellites must size solar arrays and batteries for peak demand, even though peaks are
+        infrequent, wasting mass and cost. Solution: NEOWATT power beaming payload on a nearby LEO satellite delivers burst
+        power on demand. Customer satellite carries a PV receiver. Priced per kWh of burst energy delivered.'
       category: Power Delivery
       time_horizon: Near-term
       model_class: PeakPowerModel
       notion_capabilities:
       - Higher peak power on demand
       - Purchase power during high-demand phases
-      model_prose: 'Many satellite operations require burst power far exceeding average consumption:
+      model_prose: Revenue is computed from a per-kWh burst price multiplied by the energy delivered per event (power x duration)
+        and the number of events per year. Costs follow the same CAPEX/OPEX structure as other use cases. The customer saving
+        compares our total lifetime cost per watt-peak against the incumbent cost of oversizing arrays and batteries for peak
+        demand.
+      model_maths: '**Annual revenue:**
 
-        SAR radar imaging (kW-class pulses), laser communication links, electric propulsion
-
-        burns, or electronic warfare payloads. Currently, satellites must size their solar
-
-        arrays and batteries for these peak demands, even though they only occur for minutes
-
-        or hours per day. NEOWATT provides burst power on demand, so satellites can be designed
-
-        for average power needs only. The customer saves on the capital cost of oversizing.
-
-        '
-      model_maths: '**Revenue model (annual, burst pricing):**
-
-        $$R = WTP_{/kWh} \times P_{kW} \times t_{burst} \times N_{events} \times \alpha$$
+        $$R = W_{kWh} \times P_{kW} \times t \times N \times a$$
 
 
-        Where:
-
-        - $WTP_{/kWh}$ = willingness to pay per kWh of burst power
+        - $W_{kWh}$ = price per kWh of burst power
 
         - $P_{kW}$ = peak power delivered (kW)
 
-        - $t_{burst}$ = duration of each burst event (hours)
+        - $t$ = burst duration per event (hours)
 
-        - $N_{events}$ = number of burst events per year
+        - $N$ = number of burst events per year
 
-        - $\alpha$ = system availability
-
-
-        **Cost model:** Same CAPEX/OPEX structure as standard power delivery.
+        - $a$ = system availability
 
 
-        **Customer saving:** Compares our total lifetime $/W-peak against the incumbent cost
+        **CAPEX:**
 
-        of sizing arrays + batteries for peak demand.
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
 
-        '
+
+        **Annual OPEX:** $C_{ops}$
+
+
+        **Customer saving:**
+
+        The total lifetime cost to the customer is converted to an equivalent $/W-peak for comparison with the incumbent:
+
+
+        $$P_{equiv} = \frac{W_{kWh} \times P_{kW} \times t \times N \times a \times Y}{P_W}$$
+
+
+        $$S = \frac{C_{inc} - P_{equiv}}{C_{inc}}$$
+
+
+        - $C_{inc}$ = incumbent cost per watt-peak ($/W)
+
+        - $Y$ = amortisation years
+
+        - $P_W$ = peak power in watts'
     incumbent:
       name: Oversized solar arrays + battery packs
       cost_per_W:
@@ -267,51 +274,42 @@ use_cases:
     meta:
       name: Satellite Life Extension
       slug: satellite_life_extension
-      description: Extend operational lifetimes of high-value GEO/MEO satellites with degraded power systems.
+      description: 'Customer: GEO communications satellite operators (Intelsat, SES, Eutelsat). Problem: GEO satellites generating
+        $50-200M/yr revenue are retired when solar array degradation reduces power below operational thresholds, even though
+        other subsystems still work. Solution: NEOWATT transmitter satellite in GEO co-located with the ageing satellite beams
+        supplemental power to restore capacity. Customer needs a pre-integrated PV receiver or retrofit module.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: LifeExtensionModel
       notion_capabilities:
       - Extension of satellite operational lifetimes
-      model_prose: 'GEO communications satellites generate $50-200M/year in revenue but are typically
+      model_prose: Revenue is a flat annual service fee per satellite served. The customer saving compares our annual fee
+        against the incumbent alternative (Northrop Grumman MEV docking service at ~$13M/yr, or a full replacement satellite).
+        CAPEX covers the GEO-rated transmitter, receiver, and ground infrastructure.
+      model_maths: '**Annual revenue:**
 
-        retired after 15 years when solar array degradation reduces available power below
-
-        minimum operational thresholds. The satellite bus and transponders often have remaining
-
-        useful life. NEOWATT beams supplemental power to restore the satellite to full
-
-        operational capacity, extending revenue-generating life by 1-5 years. The revealed
-
-        WTP anchor is the Intelsat/Northrop Grumman MEV-1 contract at ~$13M/year for life
-
-        extension via docking – NEOWATT offers a non-contact alternative.
-
-        '
-      model_maths: '**Revenue model (annual):**
-
-        $$R = P_{service/yr}$$
-
-        Where $P_{service/yr}$ is the annual service fee charged per satellite.
+        $$R = P_{service}$$
 
 
-        **Cost model:** Same CAPEX/OPEX structure.
+        - $P_{service}$ = annual service fee per satellite ($/yr)
+
+
+        **CAPEX:**
+
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+
+
+        **Annual OPEX:** $C_{ops}$
 
 
         **Customer saving:**
 
-        $$S = \frac{C_{incumbent/yr} - P_{service/yr}}{C_{incumbent/yr}}$$
-
-        Where $C_{incumbent/yr}$ is the annualised cost of alternatives (MEV contract or
-
-        replacement satellite amortised).
+        $$S = \frac{C_{inc} - P_{service}}{C_{inc}}$$
 
 
-        **Market sizing:**
+        - $C_{inc}$ = incumbent annual cost (MEV contract or amortised replacement satellite, $/yr)
 
-        $$TAM = P_{service/yr} \times N_{years\_extended} \times N_{addressable}$$
-
-        '
+        - $P_{service}$ = our annual service fee'
     incumbent:
       name: Replacement launch or MEV-style docking
       cost_per_year_k:
@@ -531,43 +529,49 @@ use_cases:
     meta:
       name: HAPS Power (Terrestrial)
       slug: haps_power
-      description: Ground-to-HAPS laser power beaming for indefinite station-keeping of high-altitude pseudo-satellites.
+      description: 'Customer: HAPS platform operators (Airbus Zephyr, BAE PHASA-35, SoftBank HAPSMobile). Problem: HAPS endurance
+        is limited by overnight battery capacity and seasonal solar variation. Solution: ground-based NEOWATT laser transmitter
+        beams power upward to a lightweight PV receiver on the HAPS platform at ~20km altitude. Short range, no vacuum, high
+        link efficiency. This is NEOWATT''s terrestrial wedge market with lowest technical risk.'
       category: Power Delivery
       time_horizon: Near-term
       model_class: StandardPowerModel
-      model_prose: 'High Altitude Pseudo-Satellites (HAPS) operate at 18-22km altitude providing persistent
+      model_prose: 'Same revenue model as LEO Duty Cycle Extension: price per watt times power delivered, adjusted for duty
+        cycle and availability. Key differences: the transmitter is ground-based (no launch cost for TX, but still need to
+        launch RX mass to HAPS altitude), link efficiency is higher due to short range, and weather (clouds, rain) is the
+        main availability limiter.'
+      model_maths: '**Annual revenue:**
 
-        surveillance, communications, or environmental monitoring. Their key limitation is
-
-        endurance: solar-powered HAPS like Airbus Zephyr can fly for weeks but are constrained
-
-        by overnight battery capacity and seasonal solar variation. NEOWATT beams power from
-
-        ground stations to HAPS at short range (~20km, near-vertical), achieving high link
-
-        efficiency thanks to minimal atmospheric path and no vacuum-to-atmosphere transition.
-
-        This is NEOWATT''s terrestrial wedge market – near-term, lower technical risk, and a
-
-        stepping stone to orbital systems.
-
-        '
-      model_maths: '**Revenue model (annual):**
-
-        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
+        $$R = P \times W \times d \times a$$
 
 
-        Same model as LEO Eclipse but with key differences:
+        - $P$ = power delivered at HAPS receiver (W)
 
-        - Higher $\delta$ (0.60-0.95): HAPS needs near-continuous power
+        - $W$ = willingness to pay per watt ($/W)
 
-        - Higher link efficiency (0.12-0.35): short range, thin atmosphere at altitude
+        - $d$ = duty cycle (fraction of time HAPS needs beamed power)
 
-        - Lower WTP ($140/W): competing against mature solar+battery HAPS designs
+        - $a$ = system availability (weather-dependent)
 
-        - Ground-based TX: mass is less critical, but cost still matters
 
-        '
+        **CAPEX:**
+
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+
+
+        Note: $m_{tx}$ launch cost is included for consistency but represents deployment/logistics cost rather than orbital
+        launch.
+
+
+        **Annual OPEX:** $C_{ops}$ (ground station maintenance, staffing, power)
+
+
+        **Customer saving:**
+
+        $$S = \frac{C_{inc} - W}{C_{inc}}$$
+
+
+        - $C_{inc}$ = incumbent cost per watt of HAPS onboard power ($/W)'
     incumbent:
       name: Onboard solar + battery arrays
       cost_per_W:
@@ -775,8 +779,11 @@ use_cases:
     meta:
       name: Power-as-a-Service Platform
       slug: power_as_service
-      description: Subscription-based power delivery, enabling CAPEX-to-OPEX shift. Decouples power generation from spacecraft
-        design.
+      description: 'Customer: new space entrants, hosted payload operators, and capital-constrained satellite programmes.
+        Problem: every satellite must build its own solar arrays and batteries, a major CAPEX item that delays development
+        and increases financial risk. Solution: NEOWATT operates a multi-customer power beaming satellite in LEO. Each customer
+        integrates a small PV receiver and pays an annual subscription instead of building their own power system. One TX
+        platform serves multiple customer satellites via beam steering.'
       category: Economic
       time_horizon: Mid-term
       model_class: PowerAsServiceModel
@@ -784,40 +791,38 @@ use_cases:
       - Shift from CAPEX to OPEX for power
       - Decoupling power generation from spacecraft
       - Sale of surplus power by generators
-      model_prose: 'Instead of building solar arrays and batteries into every satellite, customers subscribe
+      model_prose: Revenue is the subscription price times the number of customers served by one TX platform. CAPEX includes
+        the TX platform plus one RX module per customer (both hardware and launch). The customer saving compares the total
+        subscription cost over the system lifetime against the solar array CAPEX the customer avoids.
+      model_maths: '**Annual revenue (per TX platform):**
 
-        to a NEOWATT power service. A single NEOWATT TX platform serves multiple customer
-
-        satellites, each equipped with a lightweight RX module. Customers shift from high upfront
-
-        CAPEX (solar array + battery) to predictable OPEX (annual subscription). This benefits
-
-        new space entrants with capital constraints and enables faster satellite development by
-
-        removing the power subsystem design burden. At scale, NEOWATT operates like a utility –
-
-        selling watts from orbital infrastructure.
-
-        '
-      model_maths: '**Revenue model (annual, per TX platform):**
-
-        $$R = P_{subscription/yr} \times N_{customers}$$
+        $$R = P_{sub} \times N_{cust}$$
 
 
-        **Cost model:**
+        - $P_{sub}$ = annual subscription price per customer ($/yr)
 
-        $$C_{CAPEX} = C_{TX} + N_{customers} \times (C_{RX} + m_{RX} \times c_{launch}) + m_{TX} \times c_{launch} + C_{ground}$$
+        - $N_{cust}$ = number of customer satellites served
 
-        $$C_{OPEX/yr} = C_{ops}$$
+
+        **CAPEX:**
+
+        $$C_{capex} = C_{tx} + N_{cust} \times (C_{rx} + m_{rx} \times L) + m_{tx} \times L + C_{ground}$$
+
+
+        Note: RX costs scale with customer count; TX cost is shared.
+
+
+        **Annual OPEX:** $C_{ops}$
 
 
         **Customer saving:**
 
-        $$S = \frac{C_{CAPEX\_avoided} - P_{subscription/yr} \times N_{years}}{C_{CAPEX\_avoided}}$$
+        $$S = \frac{C_{avoided} - P_{sub} \times Y}{C_{avoided}}$$
 
-        Where $C_{CAPEX\_avoided}$ is the solar array + battery cost the customer no longer needs.
 
-        '
+        - $C_{avoided}$ = solar array + battery CAPEX the customer no longer needs ($)
+
+        - $Y$ = amortisation years'
     incumbent:
       name: Self-provisioned onboard solar + battery
       capex_avoided_per_customer_k:
@@ -1030,46 +1035,48 @@ use_cases:
     meta:
       name: Debris Laser Ablation
       slug: debris_laser_ablation
-      description: High-power laser to ablate debris surfaces, generating thrust for deorbit. No receiver needed.
+      description: 'Customer: space agencies, constellation operators, and insurance providers facing debris collision risk.
+        Problem: ~30,000 tracked debris objects threaten orbital infrastructure; no cost-effective removal solution exists
+        at scale. Solution: NEOWATT operates a high-power laser satellite in LEO. The laser ablates the surface of debris
+        objects, creating a small thrust that lowers their orbit for natural re-entry. No receiver needed -- the debris itself
+        is the target. Contactless and can engage multiple objects from a single platform.'
       category: Active Debris Removal
       time_horizon: Mid-term
       model_class: DebrisAblationModel
       incumbent_type: greenfield
-      model_prose: 'Space debris is a growing threat to orbital infrastructure. There are ~30,000 tracked
+      model_prose: Revenue is the price per debris object removed times the number of objects engaged per year. There is no
+        receiver hardware or launch cost (the target is uncooperative debris). This is a greenfield market with no direct
+        incumbent, so viability is assessed by whether the NPV is positive rather than by beating an incumbent price.
+      model_maths: '**Annual revenue:**
 
-        objects and millions of smaller fragments. No cost-effective removal solution exists at
-
-        scale. NEOWATT''s laser system can ablate the surface of debris objects, creating a small
-
-        jet of vaporised material that generates thrust to lower the object''s orbit for natural
-
-        deorbit. Unlike capture-and-deorbit methods, laser ablation is contactless and can
-
-        engage multiple objects from a single platform. Revenue comes from debris removal
-
-        contracts, regulatory compliance mandates, and insurance premium reductions.
-
-        '
-      model_maths: '**Revenue model (annual):**
-
-        $$R = WTP_{/object} \times N_{objects/yr} \times \alpha$$
+        $$R = W_{obj} \times N_{obj} \times a$$
 
 
-        **Cost model (no RX needed):**
+        - $W_{obj}$ = price per debris object removed ($/object)
 
-        $$C_{CAPEX} = C_{TX} + m_{TX} \times c_{launch} + C_{ground}$$
+        - $N_{obj}$ = objects engaged per year
 
-        $$C_{OPEX/yr} = C_{ops}$$
-
-
-        **Viability (greenfield):** No direct incumbent to beat. Uses P(positive NPV) >= 50%.
+        - $a$ = system availability
 
 
-        **Incumbent framing:** Cost of inaction = regulatory fines, insurance premium
+        **CAPEX (no receiver):**
 
-        increases, collision avoidance manoeuvre costs per object.
+        $$C_{capex} = C_{tx} + m_{tx} \times L + C_{ground}$$
 
-        '
+
+        **Annual OPEX:** $C_{ops}$
+
+
+        **Customer saving:**
+
+        $$S = \frac{C_{inaction} - W_{obj}}{C_{inaction}}$$
+
+
+        - $C_{inaction}$ = cost of not removing debris per object (regulatory fines, insurance increases, collision avoidance
+        manoeuvre costs)
+
+
+        **Viability (greenfield):** positive NPV in majority of simulations'
     incumbent:
       name: No cost-effective solution (regulatory/insurance pressure)
       cost_per_object_k:
@@ -1268,63 +1275,61 @@ use_cases:
     meta:
       name: LEO Duty Cycle Extension
       slug: leo_duty_cycle_extension
-      description: Beam power to LEO satellites during eclipse, extending operational duty cycles and reducing battery oversizing.
+      description: 'Customer: LEO satellite operators (Earth observation, comms, IoT). Problem: satellites lose power during
+        eclipse (~35% of each orbit), forcing battery oversizing and reduced duty cycles. Solution: NEOWATT power beaming
+        payload on a separate LEO satellite beams laser power to the customer satellite during eclipse. The customer satellite
+        carries a small PV receiver module.'
       category: Power Delivery
       time_horizon: Near-term
       model_class: StandardPowerModel
       notion_capabilities:
       - Power during eclipses and anomaly recovery
       - Power resilience after partial degradation or damage
-      model_prose: 'LEO satellites spend ~35% of each orbit in Earth''s shadow (eclipse). During eclipse,
+      model_prose: The model computes the annual revenue from selling eclipse power at a price per watt, then subtracts the
+        cost of building and operating the transmitter and receiver hardware. The customer saving is the percentage difference
+        between what eclipse power costs today (oversized batteries and solar arrays) and what NEOWATT charges.
+      model_maths: '**Annual revenue:**
 
-        they rely entirely on batteries charged during the sunlit portion. This forces operators
-
-        to oversize solar arrays (to charge faster) and carry large battery packs, adding mass,
-
-        cost, and failure modes. NEOWATT beams power to satellites during eclipse from an
-
-        orbital transmitter or ground station, reducing or eliminating the need for battery
-
-        oversizing. The customer value is measured by comparing NEOWATT''s price per watt of
-
-        eclipse power against the incumbent cost of achieving the same capability through
-
-        extra solar panels and batteries.
-
-        '
-      model_maths: '**Revenue model (annual):**
-
-        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
+        $$R = P \times W \times d \times a$$
 
 
-        Where:
+        - $P$ = power delivered at receiver (W)
 
-        - $P_{delivered}$ = power delivered at receiver (W)
+        - $W$ = willingness to pay per watt ($/W)
 
-        - $WTP_{/W}$ = customer willingness to pay per watt ($/W)
+        - $d$ = duty cycle (fraction of orbit in eclipse)
 
-        - $\delta$ = duty cycle (fraction of orbit in eclipse, ~0.35)
-
-        - $\alpha$ = system availability (accounting for geometry, weather, maintenance)
+        - $a$ = system availability
 
 
-        **Cost model:**
+        **CAPEX:**
 
-        $$C_{CAPEX} = C_{TX} + C_{RX} + (m_{TX} + m_{RX}) \times c_{launch} + C_{ground}$$
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
 
-        $$C_{OPEX/yr} = C_{ops}$$
 
-        $$C_{total} = C_{CAPEX} + C_{OPEX/yr} \times N_{years}$$
+        - $C_{tx}$, $C_{rx}$ = transmitter, receiver hardware cost
+
+        - $m_{tx}$, $m_{rx}$ = transmitter, receiver mass (kg)
+
+        - $L$ = launch cost per kg
+
+        - $C_{ground}$ = ground segment setup cost
+
+
+        **Annual OPEX:** $C_{ops}$ (operations, ground segment, maintenance)
 
 
         **Customer saving vs incumbent:**
 
-        $$S = \frac{C_{incumbent/W} - WTP_{/W}}{C_{incumbent/W}}$$
+        $$S = \frac{C_{inc} - W}{C_{inc}}$$
 
 
-        **Viability test:** $P(S \geq 50\%) \geq 60\%$ → GO
+        - $C_{inc}$ = incumbent cost per watt ($/W) for eclipse power via batteries + panel overbuild
 
-        '
+        - $W$ = our price per watt
+
+
+        **Viability test:** $S \geq$ required margin'
     incumbent:
       name: Battery oversizing + extra solar panels
       cost_per_W:
@@ -1545,44 +1550,51 @@ use_cases:
     meta:
       name: Covert Spacecraft
       slug: covert_spacecraft
-      description: Reduce radar cross-section and optical reflectivity by removing large solar arrays. Enables low-observable
-        spacecraft for defence and intelligence applications.
+      description: 'Customer: defence and intelligence agencies (MOD, DoD, allied nations). Problem: solar arrays are the
+        dominant contributor to a satellite''s radar cross-section and optical brightness, making military satellites detectable.
+        Current stealth measures (coatings, orbit selection) are limited and compromise mission performance. Solution: NEOWATT
+        power beaming payload on a separate satellite delivers power to the covert spacecraft, which operates without solar
+        arrays. The customer integrates a low-profile PV receiver flush with the spacecraft body.'
       category: Defence
       time_horizon: Long-term
       model_class: StealthModel
       notion_capabilities:
       - Reduced radar cross section
       - Reduced optical reflectivity
-      model_prose: 'Solar arrays are the dominant contributor to a satellite''s radar cross-section (RCS)
+      model_prose: Revenue is computed as power times price per watt, multiplied by a defence premium reflecting the strategic
+        value of low observability. Defence customers typically pay 1.5-4x commercial prices. The customer saving compares
+        our total cost per spacecraft against the current cost of stealth measures (coatings, operational constraints, structural
+        stiffening).
+      model_maths: '**Annual revenue:**
 
-        and optical brightness. For defence applications, reducing detectability is operationally
-
-        critical. Removing arrays can reduce RCS by 10-20dB and optical magnitude by 2-4 mag.
-
-        Current alternatives (coatings, orbit selection, operational constraints) are limited
-
-        and compromise mission performance. NEOWATT offers a structural solution by eliminating
-
-        the primary signature source. Defence customers typically have higher WTP with less
-
-        price sensitivity.
-
-        '
-      model_maths: '**Revenue model (annual):**
-
-        $$R = P_{delivered} \times WTP_{/W} \times \kappa_{defence} \times \alpha$$
+        $$R = P \times W \times k \times a$$
 
 
-        Where $\kappa_{defence}$ is the defence WTP premium multiplier (typically 1.2-4x)
+        - $P$ = power delivered (W)
 
-        reflecting the strategic value of low observability.
+        - $W$ = base willingness to pay per watt ($/W)
+
+        - $k$ = defence WTP premium multiplier
+
+        - $a$ = system availability
+
+
+        **CAPEX:**
+
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+
+
+        **Annual OPEX:** $C_{ops}$
 
 
         **Customer saving:**
 
-        $$S = \frac{C_{incumbent/sc} - C_{NEOWATT/sc}}{C_{incumbent/sc}}$$
+        $$S = \frac{C_{inc} - W \times P}{C_{inc}}$$
 
-        '
+
+        - $C_{inc}$ = incumbent cost of stealth measures per spacecraft ($)
+
+        - $W \times P$ = our cost to the customer per spacecraft (base WTP times power, without premium)'
     incumbent:
       name: Orbit selection + coatings + operational constraints
       cost_per_spacecraft_k:
@@ -1790,28 +1802,45 @@ use_cases:
     meta:
       name: Onboard Power Delivery
       slug: onboard_power_delivery
-      description: Wireless power delivery to robotic systems on or near a spacecraft or structure. Eliminates PV arrays on
-        robots and power cabling along structures (e.g. truss assembly robots, free-flying inspection drones, construction
-        manipulators).
+      description: 'Customer: operators of orbital robotic systems -- truss assembly robots, free-flying inspection drones,
+        construction manipulators, refuelling vehicles. Problem: each robot needs its own solar arrays and batteries (adding
+        mass and failure modes), or must be physically tethered to a power bus via cabling (constraining range and assembly
+        geometry). Solution: NEOWATT transmitter on the host spacecraft or nearby platform beams power wirelessly to robots
+        within a few hundred km. Each robot carries a small PV receiver instead of solar arrays.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
-      model_prose: Robotic systems in orbit -- truss assembly robots, free-flying inspectors, construction manipulators --
-        currently need their own solar arrays and batteries, or must be physically tethered to a power bus via cabling. Solar
-        arrays add mass and failure modes to robots; cabling constrains assembly geometry and limits range of motion. NEOWATT
-        beams power wirelessly to these systems from a nearby host spacecraft or dedicated transmitter, enabling untethered
-        operation without onboard PV. The customer value is mass savings per robot, operational flexibility, and elimination
-        of power cabling infrastructure.
-      model_maths: '**Revenue model:** Standard power delivery.
+      model_prose: 'Same model structure as LEO Duty Cycle Extension: revenue from price per watt times power delivered, adjusted
+        for duty cycle and availability. The customer saving compares our price per watt against the cost per watt of onboard
+        solar + battery or the cost of power cabling infrastructure.'
+      model_maths: '**Annual revenue:**
 
-        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
+        $$R = P \times W \times d \times a$$
 
 
-        The key value here is mass budget improvement for the servicer – every kg of
+        - $P$ = power delivered to robot/vehicle (W)
 
-        power system removed is a kg of additional propellant or servicing equipment.
+        - $W$ = willingness to pay per watt ($/W)
 
-        '
+        - $d$ = duty cycle (fraction of time requiring beamed power)
+
+        - $a$ = system availability
+
+
+        **CAPEX:**
+
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+
+
+        **Annual OPEX:** $C_{ops}$
+
+
+        **Customer saving:**
+
+        $$S = \frac{C_{inc} - W}{C_{inc}}$$
+
+
+        - $C_{inc}$ = incumbent cost per watt of robot onboard power or cabling ($/W)'
     incumbent:
       name: Onboard solar + battery or power cabling
       cost_per_W:
@@ -2011,32 +2040,45 @@ use_cases:
     meta:
       name: Lunar and Deep-Space Night Power
       slug: lunar_deep_space_night
-      description: 'Power delivery to assets in prolonged darkness: lunar night (14 days), permanently shadowed regions (lunar
-        south pole craters), and asteroid shadows. Replaces RTGs or mission hibernation.'
+      description: 'Customer: lunar surface mission operators (NASA Artemis, ESA, ispace, Astrobotic, Intuitive Machines)
+        and deep-space missions. Problem: the 14-day lunar night and permanently shadowed craters have no sunlight -- missions
+        must hibernate or carry RTGs (expensive, export-controlled, limited Pu-238 supply). Solution: NEOWATT transmitter
+        on a lunar orbiter or crater-rim relay station beams power to surface assets during darkness. Customer integrates
+        a dust-resistant PV receiver on the lander or rover.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
-      model_prose: Several space environments have prolonged or permanent darkness where solar power is unavailable. The 14-day
-        lunar night forces surface missions to hibernate or carry RTGs. Permanently shadowed regions (PSRs) at the lunar south
-        pole contain valuable water ice but receive no sunlight at all. Deep-space asteroid missions face similar challenges.
-        NEOWATT beams power from a sunlit orbital relay or surface hilltop transmitter, enabling continuous operations. The
-        extremely high WTP reflects the scarcity of alternatives -- RTGs are expensive, export-controlled, and limited in
-        Pu-238 supply.
-      model_maths: '**Revenue model:** Same as standard power delivery.
+      model_prose: Same model structure as LEO Duty Cycle Extension. Revenue from price per watt times power delivered, adjusted
+        for the night fraction (~50% for lunar day/night cycle) and availability. Very high WTP due to scarcity of alternatives.
+        The customer saving compares our price against the cost of RTGs or the economic value lost from mission hibernation.
+      model_maths: '**Annual revenue:**
 
-        $$R = P_{delivered} \times WTP_{/W} \times \delta_{night} \times \alpha$$
+        $$R = P \times W \times d \times a$$
 
 
-        Where $\delta_{night} \approx 0.5$ (14 days night / 28 day cycle).
+        - $P$ = power delivered to surface asset (W)
+
+        - $W$ = willingness to pay per watt ($/W)
+
+        - $d$ = duty cycle (~0.50 for 14-day night out of 28-day cycle)
+
+        - $a$ = system availability
 
 
-        **Key challenge:** If beaming from Earth, distance is ~384,400km with very low
+        **CAPEX:**
 
-        link efficiency (~4%). Lunar orbiter relay is more efficient but adds orbital
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
 
-        infrastructure cost.
 
-        '
+        **Annual OPEX:** $C_{ops}$
+
+
+        **Customer saving:**
+
+        $$S = \frac{C_{inc} - W}{C_{inc}}$$
+
+
+        - $C_{inc}$ = incumbent cost per watt ($/W) -- RTG cost or economic value of mission downtime during lunar night'
       notion_capabilities:
       - Power available in shadowed or low-illumination regions
       - Power during lunar night
@@ -2244,8 +2286,11 @@ use_cases:
     meta:
       name: PV-Free Spacecraft
       slug: array_free_spacecraft
-      description: Reduce or eliminate onboard solar arrays, saving launch mass, volume, and drag, while also freeing the
-        attitude budget from Sun-pointing constraints. Improves pointing stability for EO and astronomy missions.
+      description: 'Customer: LEO constellation operators (OneWeb, Kuiper) and precision-pointing missions (Earth observation,
+        astronomy). Problem: deployable solar arrays add mass, volume, drag, and collision risk. They also force a Sun-pointing
+        constraint that competes with payload pointing, and introduce structural vibrations that degrade imaging quality.
+        Solution: customer satellite eliminates or reduces its solar arrays and carries a NEOWATT PV receiver instead. Power
+        is beamed from a separate NEOWATT transmitter satellite in a nearby orbit.'
       category: Spacecraft Design
       time_horizon: Mid-term
       model_class: LightweightSCModel
@@ -2256,33 +2301,39 @@ use_cases:
       - Reduced drag and collision risk
       - Reduced need for Sun-pointing
       - Improved pointing stability
-      model_prose: 'Deployable solar arrays are a major mass, volume, and cost driver for satellites. They also constrain
-        attitude control: satellites must balance Sun-pointing (for power) with payload-pointing (for imaging, comms). This
-        forces complex SADA mechanisms and introduces low-frequency structural oscillations. For LEO constellations, arrays
-        increase drag and collision cross-section. NEOWATT enables array-free or array-reduced designs with two value streams:
+      model_prose: Revenue is the annual value to the customer of removing solar array mass. This is computed as the mass
+        saved times the sum of launch cost savings and array hardware cost savings, annualised over the system lifetime. The
+        customer saving compares the per-kg cost of our RX module against the per-kg cost of the solar arrays it replaces.
+      model_maths: '**Annual revenue (value of mass saved):**
+
+        $$R = \frac{m_s \times (L + C_{array/kg})}{Y}$$
 
 
-        1. **Mass/volume/drag savings**: every kg of removed array saves launch cost and reduces collision risk
+        - $m_s$ = mass of removed solar arrays (kg)
 
-        2. **Pointing freedom**: removing arrays eliminates the Sun-pointing constraint, freeing the full attitude budget
-        for payload operations and improving image quality for EO/astronomy missions'
-      model_maths: '**Annual value to customer (two streams):**
+        - $L$ = launch cost per kg ($/kg)
 
-        $$V_{annual} = \frac{m_{saved} \times (c_{launch} + c_{array/kg})}{N_{years}}$$
+        - $C_{array/kg}$ = cost per kg of deployable solar array hardware ($/kg)
+
+        - $Y$ = amortisation years
 
 
-        Where:
+        **CAPEX:**
 
-        - $m_{saved}$ = mass of removed solar arrays (kg)
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
 
-        - $c_{launch}$ = launch cost per kg
 
-        - $c_{array/kg}$ = hardware cost per kg of deployable solar array
+        **Annual OPEX:** $C_{ops}$
 
 
         **Customer saving:**
 
-        $$S = \frac{c_{array/kg} - c_{RX/kg\_saved}}{c_{array/kg}}$$'
+        $$S = \frac{C_{array/kg} - C_{rx/kg}}{C_{array/kg}}$$
+
+
+        - $C_{array/kg}$ = incumbent solar array cost per kg ($/kg)
+
+        - $C_{rx/kg}$ = our RX cost per kg of array mass saved: $(C_{rx} + m_{rx} \times L) / m_s$'
     incumbent:
       name: Standard onboard solar arrays
       array_cost_per_kg:
@@ -2492,29 +2543,46 @@ use_cases:
     meta:
       name: Remote Power Delivery
       slug: remote_power_delivery
-      description: Decouple power generation from power consumption by beaming power between separate orbital assets. Enables
-        independent lifecycle management -- e.g. solar arrays last 15+ years but compute chips become obsolete in 3-5 years.
+      description: 'Customer: orbital compute providers (Axiom, Varda, OrbitsEdge), modular satellite operators, and any architecture
+        where power generation and consumption have mismatched lifetimes. Problem: current spacecraft tightly couple solar
+        arrays with payload. When payload becomes obsolete (compute chips every 3-5 years), the still-functional arrays are
+        wasted. Conversely, array degradation retires a working payload. Solution: NEOWATT operates a long-lived solar generation
+        platform that beams power to short-lived consumer modules in a nearby orbit. Consumer modules carry only a PV receiver
+        and payload, no arrays.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
-      model_prose: 'Current spacecraft tightly couple power generation (solar arrays) with power consumption (payload). This
-        means when the payload becomes obsolete (e.g. compute chips every 3-5 years), the still-functional solar arrays are
-        deorbited with it. Conversely, when arrays degrade, a perfectly good payload loses power. NEOWATT enables decoupling:
-        a long-lived solar generation platform beams power to short-lived consumer modules. Key application: orbital compute,
-        where chip generations turn over rapidly but power infrastructure can serve 15+ years. Also relevant for any architecture
-        where generation and consumption have mismatched lifetimes or where co-location is impractical.'
-      model_maths: '**Revenue model (annual):**
+      model_prose: Same model structure as LEO Duty Cycle Extension. Revenue from price per watt times power delivered, adjusted
+        for duty cycle and availability. The key value driver is avoiding the cost of co-locating solar arrays on each payload
+        generation. Over multiple payload refreshes, the cumulative saving from reusing power infrastructure grows.
+      model_maths: '**Annual revenue:**
 
-        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
+        $$R = P \times W \times d \times a$$
+
+
+        - $P$ = power delivered to consumer module (W)
+
+        - $W$ = willingness to pay per watt ($/W)
+
+        - $d$ = duty cycle (fraction of orbit delivering power)
+
+        - $a$ = system availability
+
+
+        **CAPEX:**
+
+        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+
+
+        **Annual OPEX:** $C_{ops}$
 
 
         **Customer saving:**
 
-        $$S = \frac{C_{incumbent/W} - WTP_{/W}}{C_{incumbent/W}}$$
+        $$S = \frac{C_{inc} - W}{C_{inc}}$$
 
 
-        **Key value driver:** Avoided cost of replacing solar arrays each time a payload module is swapped. Over multiple
-        payload generations, the cumulative saving from reusing power infrastructure grows.'
+        - $C_{inc}$ = cost per watt of co-located solar arrays that are discarded with each payload refresh ($/W)'
     incumbent:
       name: Co-located solar arrays on each payload module
       cost_per_W:

@@ -276,7 +276,7 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
     model_prose = meta.get("model_prose", "")
     model_maths = meta.get("model_maths", "")
     if model_prose or model_maths:
-        with st.expander("Model explanation", expanded=True):
+        with st.expander("Model details", expanded=True):
             if model_prose:
                 st.markdown(_esc_prose(model_prose))
             if model_maths:

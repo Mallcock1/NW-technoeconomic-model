@@ -32,7 +32,7 @@ def render_deep_dive(result: ModelResult, uc_params: dict, required_margin: floa
     model_maths = meta.get("model_maths", "")
 
     if model_prose or model_maths:
-        with st.expander("Model explanation", expanded=True):
+        with st.expander("Model details", expanded=True):
             if model_prose:
                 st.markdown(_esc_prose(model_prose))
             if model_maths:
