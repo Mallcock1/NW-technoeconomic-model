@@ -27,6 +27,10 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
     gp = global_params["global"]
 
     launch_cost = get_param_value(econ.get("launch_cost_per_kg", {"value": 5000}))
+    model_class_name = meta["model_class"]
+    is_hardware_sale = model_class_name in (
+        "HardwareSaleModel", "HardwarePVFreeModel", "HardwareCovertModel",
+    )
 
     # CAPEX
     tx_hw = get_param_value(cost.get("tx_hardware_k", {"value": 0})) * 1000
@@ -34,7 +38,13 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
     tx_mass = get_param_value(cost.get("tx_mass_kg", {"value": 0}))
     rx_mass = get_param_value(cost.get("rx_mass_kg", {"value": 0}))
     ground = get_param_value(cost.get("ground_segment_k", {"value": 0})) * 1000
-    capex = tx_hw + rx_hw + (tx_mass + rx_mass) * launch_cost + ground
+
+    if is_hardware_sale:
+        # Hardware sale: NEOWATT pays manufacturing only, no launch
+        capex = tx_hw + rx_hw + ground
+    else:
+        # Service: NEOWATT pays manufacturing + launch
+        capex = tx_hw + rx_hw + (tx_mass + rx_mass) * launch_cost + ground
 
     # Annual OPEX
     opex_yr = get_param_value(cost.get("ops_cost_k_yr", {"value": 0})) * 1000
@@ -46,7 +56,6 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
     total_cost = capex + opex_yr * amort
 
     # Annual revenue (model-dependent)
-    model_class_name = meta["model_class"]
     annual_revenue = _compute_annual_revenue_point(model_class_name, uc_params, gp)
 
     # Total revenue
@@ -79,6 +88,14 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
         else:
             label = "KILL"
 
+    # TX and RX cost breakdown (for charts)
+    if is_hardware_sale:
+        tx_total = tx_hw  # no launch cost for NEOWATT
+        rx_total = rx_hw
+    else:
+        tx_total = tx_hw + tx_mass * launch_cost
+        rx_total = rx_hw + rx_mass * launch_cost
+
     # Breakeven price: the max we can charge and still meet required_margin
     # saving = (inc_cost - price) / inc_cost >= required_margin
     # => price <= inc_cost * (1 - required_margin)
@@ -100,7 +117,7 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
         "incumbent_type": incumbent_type,
         "capex": capex,
         "tx_cost": tx_total,
-        "rx_cost": rx_hw + rx_mass * launch_cost,
+        "rx_cost": rx_total,
         "opex_yr": opex_yr,
         "total_cost": total_cost,
         "annual_revenue": annual_revenue,
@@ -169,6 +186,21 @@ def _compute_annual_revenue_point(model_class: str, uc_params: dict, gp: dict) -
         avail = get_param_value(tech.get("availability", {"value": 0.85}))
         return objects * wtp * avail
 
+    if model_class in ("HardwareSaleModel", "HardwarePVFreeModel"):
+        tx_sale = get_param_value(econ.get("tx_sale_price_k", {"value": 0})) * 1000
+        rx_sale = get_param_value(econ.get("rx_sale_price_k", {"value": 0})) * 1000
+        amort = get_param_value(econ.get("amortization_years", {"value": 7}))
+        support = get_param_value(econ.get("annual_support_k", {"value": 0})) * 1000
+        return (tx_sale + rx_sale) / amort + support
+
+    if model_class == "HardwareCovertModel":
+        tx_sale = get_param_value(econ.get("tx_sale_price_k", {"value": 0})) * 1000
+        rx_sale = get_param_value(econ.get("rx_sale_price_k", {"value": 0})) * 1000
+        premium = get_param_value(tech.get("defence_wtp_premium", {"value": 1.0}))
+        amort = get_param_value(econ.get("amortization_years", {"value": 8}))
+        support = get_param_value(econ.get("annual_support_k", {"value": 0})) * 1000
+        return (tx_sale + rx_sale) * premium / amort + support
+
     return 0
 
 
@@ -219,6 +251,22 @@ def _compute_saving_point(model_class: str, uc_params: dict, gp: dict, amort: fl
     elif model_class == "DebrisAblationModel":
         inc_cost = get_param_value(inc.get("cost_per_object_k", {"value": 0})) * 1000
         our_price = get_param_value(econ.get("wtp_per_object_k", {"value": 0})) * 1000
+    elif model_class == "HardwareSaleModel":
+        inc_cost = get_param_value(inc.get("cost_per_W", {"value": 0}))
+        tx_sale = get_param_value(econ.get("tx_sale_price_k", {"value": 0})) * 1000
+        rx_sale = get_param_value(econ.get("rx_sale_price_k", {"value": 0})) * 1000
+        power = get_param_value(tech.get("power_delivered_W", {"value": 1}))
+        our_price = (tx_sale + rx_sale) / power if power > 0 else float("inf")
+    elif model_class == "HardwarePVFreeModel":
+        inc_cost = get_param_value(inc.get("array_cost_per_kg", {"value": 0}))
+        rx_sale = get_param_value(econ.get("rx_sale_price_k", {"value": 0})) * 1000
+        mass_saved = get_param_value(tech.get("mass_saved_kg", {"value": 1}))
+        our_price = rx_sale / max(mass_saved, 1)
+    elif model_class == "HardwareCovertModel":
+        inc_cost = get_param_value(inc.get("cost_per_spacecraft_k", {"value": 0})) * 1000
+        tx_sale = get_param_value(econ.get("tx_sale_price_k", {"value": 0})) * 1000
+        rx_sale = get_param_value(econ.get("rx_sale_price_k", {"value": 0})) * 1000
+        our_price = tx_sale + rx_sale
     else:
         inc_cost = 0
         our_price = 0

@@ -6,6 +6,9 @@ from neowatt.use_cases.lightweight_sc import LightweightSCModel
 from neowatt.use_cases.attitude_independent import AttitudeIndependentModel
 from neowatt.use_cases.stealth import StealthModel
 from neowatt.use_cases.debris_ablation import DebrisAblationModel
+from neowatt.use_cases.hardware_sale import HardwareSaleModel
+from neowatt.use_cases.hardware_pvfree import HardwarePVFreeModel
+from neowatt.use_cases.hardware_covert import HardwareCovertModel
 
 MODEL_REGISTRY = {
     "StandardPowerModel": StandardPowerModel,
@@ -16,4 +19,7 @@ MODEL_REGISTRY = {
     "AttitudeIndependentModel": AttitudeIndependentModel,
     "StealthModel": StealthModel,
     "DebrisAblationModel": DebrisAblationModel,
+    "HardwareSaleModel": HardwareSaleModel,
+    "HardwarePVFreeModel": HardwarePVFreeModel,
+    "HardwareCovertModel": HardwareCovertModel,
 }

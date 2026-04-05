@@ -4,59 +4,42 @@ use_cases:
       name: Peak Power on Demand
       slug: peak_power
       description: 'Customer: satellite operators needing burst power for SAR imaging, laser comms, electric propulsion, or
-        electronic warfare. Problem: satellites must size solar arrays and batteries for peak demand, even though peaks are
-        infrequent, wasting mass and cost. Solution: NEOWATT power beaming payload on a nearby LEO satellite delivers burst
-        power on demand. Customer satellite carries a PV receiver. Priced per kWh of burst energy delivered.'
+        electronic warfare. Problem: satellites must size solar arrays and batteries for peak demand even though peaks are
+        infrequent. Solution: NEOWATT sells a TX payload and RX modules that the customer integrates within their own constellation
+        or co-manifested assets. The customer schedules burst power delivery using their own mission planning. Architecture:
+        same rationale as LEO Duty Cycle Extension -- the customer operates both sides and does not want third-party satellites
+        in their orbit.'
       category: Power Delivery
       time_horizon: Near-term
-      model_class: PeakPowerModel
+      model_class: HardwareSaleModel
       notion_capabilities:
       - Higher peak power on demand
       - Purchase power during high-demand phases
-      model_prose: Revenue is computed from a per-kWh burst price multiplied by the energy delivered per event (power x duration)
-        and the number of events per year. Costs follow the same CAPEX/OPEX structure as other use cases. The customer saving
-        compares our total lifetime cost per watt-peak against the incumbent cost of oversizing arrays and batteries for peak
-        demand.
+      model_prose: Same hardware sale model as LEO Duty Cycle Extension. Revenue is TX+RX sale price annualised plus support
+        fees. NEOWATT's costs are manufacturing only. The customer saving compares our hardware cost per watt-peak against
+        the incumbent cost of oversizing arrays and batteries for peak demand.
       model_maths: '**Annual revenue:**
 
-        $$R = W_{kWh} \times P_{kW} \times t \times N \times a$$
+        $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
 
 
-        - $W_{kWh}$ = price per kWh of burst power
+        **NEOWATT CAPEX (manufacturing):**
 
-        - $P_{kW}$ = peak power delivered (kW)
-
-        - $t$ = burst duration per event (hours)
-
-        - $N$ = number of burst events per year
-
-        - $a$ = system availability
-
-
-        **CAPEX:**
-
-        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+        $$C_{capex} = C_{tx} + C_{rx} + C_{ground}$$
 
 
         **Annual OPEX:** $C_{ops}$
 
 
-        **Customer saving:**
+        **Customer''s total cost per watt-peak:**
 
-        The total lifetime cost to the customer is converted to an equivalent $/W-peak for comparison with the incumbent:
-
-
-        $$P_{equiv} = \frac{W_{kWh} \times P_{kW} \times t \times N \times a \times Y}{P_W}$$
+        $$P_{cust} = \frac{S_{tx} + S_{rx}}{P}$$
 
 
-        $$S = \frac{C_{inc} - P_{equiv}}{C_{inc}}$$
+        - $P$ = peak power delivered (W)
 
 
-        - $C_{inc}$ = incumbent cost per watt-peak ($/W)
-
-        - $Y$ = amortisation years
-
-        - $P_W$ = peak power in watts'
+        **Customer saving:** $S = (C_{inc} - P_{cust}) / C_{inc}$'
     incumbent:
       name: Oversized solar arrays + battery packs
       cost_per_W:
@@ -270,14 +253,52 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+      tx_sale_price_k:
+        value: 360
+        unit: $k
+        description: Sale price of TX payload to customer
+        justification: Manufacturing cost $200k with ~180% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 252
+          mode: 360
+          high: 540
+      rx_sale_price_k:
+        value: 80
+        unit: $k
+        description: Sale price of RX module to customer
+        justification: Manufacturing cost $50k with ~160% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 56
+          mode: 80
+          high: 120
+      annual_support_k:
+        value: 20
+        unit: $k/yr
+        description: Annual support, software updates, and licensing fee
+        justification: 'Recurring revenue stream: $20k/yr for mission support and SW updates.'
+        confidence: guessed
+        source: Analogous space hardware support contracts
+        distribution:
+          type: triangular
+          low: 10
+          mode: 20
+          high: 40
   satellite_life_extension:
     meta:
       name: Satellite Life Extension
       slug: satellite_life_extension
       description: 'Customer: GEO communications satellite operators (Intelsat, SES, Eutelsat). Problem: GEO satellites generating
-        $50-200M/yr revenue are retired when solar array degradation reduces power below operational thresholds, even though
-        other subsystems still work. Solution: NEOWATT transmitter satellite in GEO co-located with the ageing satellite beams
-        supplemental power to restore capacity. Customer needs a pre-integrated PV receiver or retrofit module.'
+        $50-200M/yr revenue are retired when solar array degradation reduces power below operational thresholds. Solution:
+        NEOWATT operates a TX satellite co-located in GEO with the ageing customer satellite, beaming supplemental power to
+        restore capacity. Architecture: the ageing satellite cannot be modified (already in orbit, no RX pre-integrated).
+        NEOWATT must operate its own co-located TX satellite and sell power delivery as a service. The customer may not even
+        be the original satellite manufacturer. Service model is the only option.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: LifeExtensionModel
@@ -530,48 +551,40 @@ use_cases:
       name: HAPS Power (Terrestrial)
       slug: haps_power
       description: 'Customer: HAPS platform operators (Airbus Zephyr, BAE PHASA-35, SoftBank HAPSMobile). Problem: HAPS endurance
-        is limited by overnight battery capacity and seasonal solar variation. Solution: ground-based NEOWATT laser transmitter
-        beams power upward to a lightweight PV receiver on the HAPS platform at ~20km altitude. Short range, no vacuum, high
-        link efficiency. This is NEOWATT''s terrestrial wedge market with lowest technical risk.'
+        is limited by overnight battery capacity and seasonal solar variation. Solution: NEOWATT sells a ground-based TX unit
+        that the customer installs at their ground station, plus a lightweight RX module integrated on the HAPS platform.
+        Architecture: the ground TX is just equipment the HAPS operator buys and installs -- no satellite involved. This is
+        NEOWATT''s terrestrial wedge market with lowest technical risk. The HAPS operator runs the whole system; NEOWATT provides
+        hardware and support.'
       category: Power Delivery
       time_horizon: Near-term
-      model_class: StandardPowerModel
-      model_prose: 'Same revenue model as LEO Duty Cycle Extension: price per watt times power delivered, adjusted for duty
-        cycle and availability. Key differences: the transmitter is ground-based (no launch cost for TX, but still need to
-        launch RX mass to HAPS altitude), link efficiency is higher due to short range, and weather (clouds, rain) is the
-        main availability limiter.'
+      model_class: HardwareSaleModel
+      model_prose: Same hardware sale model. Revenue is TX+RX sale price annualised plus support fees. NEOWATT's costs are
+        manufacturing the ground TX unit and the airborne RX module. No launch costs at all (ground TX is deployed on-site,
+        RX is integrated on the HAPS by the customer). Customer saving compares our hardware cost per watt against the incumbent
+        cost of onboard solar+battery HAPS power systems.
       model_maths: '**Annual revenue:**
 
-        $$R = P \times W \times d \times a$$
+        $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
 
 
-        - $P$ = power delivered at HAPS receiver (W)
+        **NEOWATT CAPEX (manufacturing):**
 
-        - $W$ = willingness to pay per watt ($/W)
-
-        - $d$ = duty cycle (fraction of time HAPS needs beamed power)
-
-        - $a$ = system availability (weather-dependent)
+        $$C_{capex} = C_{tx} + C_{rx} + C_{ground}$$
 
 
-        **CAPEX:**
-
-        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+        Note: no launch costs -- TX is ground-based, RX is integrated by customer.
 
 
-        Note: $m_{tx}$ launch cost is included for consistency but represents deployment/logistics cost rather than orbital
-        launch.
+        **Annual OPEX:** $C_{ops}$
 
 
-        **Annual OPEX:** $C_{ops}$ (ground station maintenance, staffing, power)
+        **Customer''s cost per watt:**
+
+        $$P_{cust} = \frac{S_{tx} + S_{rx}}{P}$$
 
 
-        **Customer saving:**
-
-        $$S = \frac{C_{inc} - W}{C_{inc}}$$
-
-
-        - $C_{inc}$ = incumbent cost per watt of HAPS onboard power ($/W)'
+        **Customer saving:** $S = (C_{inc} - P_{cust}) / C_{inc}$'
     incumbent:
       name: Onboard solar + battery arrays
       cost_per_W:
@@ -633,8 +646,8 @@ use_cases:
         value: 120
         unit: $k
         description: Ground-based transmitter cost
-        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial
-          laser + tracking system. $60-250k.
+        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial laser
+          + tracking system. $60-250k.
         distribution:
           type: triangular
           low: 60
@@ -775,15 +788,52 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+      tx_sale_price_k:
+        value: 192
+        unit: $k
+        description: Sale price of TX payload to customer
+        justification: Manufacturing cost $120k with ~160% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 134
+          mode: 192
+          high: 288
+      rx_sale_price_k:
+        value: 60
+        unit: $k
+        description: Sale price of RX module to customer
+        justification: Manufacturing cost $40k with ~150% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 42
+          mode: 60
+          high: 90
+      annual_support_k:
+        value: 10
+        unit: $k/yr
+        description: Annual support, software updates, and licensing fee
+        justification: 'Recurring revenue stream: $10k/yr for mission support and SW updates.'
+        confidence: guessed
+        source: Analogous space hardware support contracts
+        distribution:
+          type: triangular
+          low: 5
+          mode: 10
+          high: 20
   power_as_service:
     meta:
       name: Power-as-a-Service Platform
       slug: power_as_service
       description: 'Customer: new space entrants, hosted payload operators, and capital-constrained satellite programmes.
-        Problem: every satellite must build its own solar arrays and batteries, a major CAPEX item that delays development
-        and increases financial risk. Solution: NEOWATT operates a multi-customer power beaming satellite in LEO. Each customer
-        integrates a small PV receiver and pays an annual subscription instead of building their own power system. One TX
-        platform serves multiple customer satellites via beam steering.'
+        Problem: every satellite must build its own solar arrays and batteries, a major CAPEX item. Solution: NEOWATT operates
+        a multi-customer TX satellite in LEO. Each customer integrates a small RX and pays an annual subscription. Architecture:
+        this is a utility model by definition -- NEOWATT owns and operates the power infrastructure, customers subscribe.
+        One TX platform serves multiple customer satellites via beam steering. NEOWATT sells the RX modules but operates the
+        TX.'
       category: Economic
       time_horizon: Mid-term
       model_class: PowerAsServiceModel
@@ -1036,10 +1086,10 @@ use_cases:
       name: Debris Laser Ablation
       slug: debris_laser_ablation
       description: 'Customer: space agencies, constellation operators, and insurance providers facing debris collision risk.
-        Problem: ~30,000 tracked debris objects threaten orbital infrastructure; no cost-effective removal solution exists
-        at scale. Solution: NEOWATT operates a high-power laser satellite in LEO. The laser ablates the surface of debris
-        objects, creating a small thrust that lowers their orbit for natural re-entry. No receiver needed -- the debris itself
-        is the target. Contactless and can engage multiple objects from a single platform.'
+        Problem: ~30,000 tracked debris objects threaten orbital infrastructure; no cost-effective removal solution exists.
+        Solution: NEOWATT operates a high-power laser satellite in LEO that ablates debris surfaces to generate deorbit thrust.
+        Architecture: there is no customer satellite -- the target is uncooperative debris. NEOWATT must own and operate the
+        laser platform and sell removal contracts. Government/agency customers pay per object removed.'
       category: Active Debris Removal
       time_horizon: Mid-term
       model_class: DebrisAblationModel
@@ -1275,61 +1325,56 @@ use_cases:
     meta:
       name: LEO Duty Cycle Extension
       slug: leo_duty_cycle_extension
-      description: 'Customer: LEO satellite operators (Earth observation, comms, IoT). Problem: satellites lose power during
-        eclipse (~35% of each orbit), forcing battery oversizing and reduced duty cycles. Solution: NEOWATT power beaming
-        payload on a separate LEO satellite beams laser power to the customer satellite during eclipse. The customer satellite
-        carries a small PV receiver module.'
+      description: 'Customer: LEO satellite operators (Earth observation, comms, IoT constellations). Problem: satellites
+        lose power during eclipse (~35% of each orbit), forcing battery oversizing and reduced duty cycles. Solution: NEOWATT
+        sells a TX payload that the customer integrates on one satellite in their constellation, plus RX modules for the satellites
+        that receive power. The customer operates both sides within their own constellation. Architecture: constellation operators
+        already have their own satellites and orbital planes -- they do not want a third-party satellite in their formation.
+        Hardware sale is the natural model.'
       category: Power Delivery
       time_horizon: Near-term
-      model_class: StandardPowerModel
+      model_class: HardwareSaleModel
       notion_capabilities:
       - Power during eclipses and anomaly recovery
       - Power resilience after partial degradation or damage
-      model_prose: The model computes the annual revenue from selling eclipse power at a price per watt, then subtracts the
-        cost of building and operating the transmitter and receiver hardware. The customer saving is the percentage difference
-        between what eclipse power costs today (oversized batteries and solar arrays) and what NEOWATT charges.
+      model_prose: NEOWATT manufactures and sells TX and RX hardware to the customer. Revenue is the hardware sale price (annualised
+        over the system lifetime) plus an annual support fee. NEOWATT's costs are manufacturing and ground support -- no launch
+        costs (the customer pays for their own launch). The customer saving compares the total hardware cost per watt against
+        the incumbent cost of achieving eclipse power via battery oversizing.
       model_maths: '**Annual revenue:**
 
-        $$R = P \times W \times d \times a$$
+        $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
 
 
-        - $P$ = power delivered at receiver (W)
+        - $S_{tx}$, $S_{rx}$ = TX, RX sale prices ($)
 
-        - $W$ = willingness to pay per watt ($/W)
+        - $Y$ = amortisation years
 
-        - $d$ = duty cycle (fraction of orbit in eclipse)
-
-        - $a$ = system availability
+        - $F_{support}$ = annual support/licensing fee ($/yr)
 
 
-        **CAPEX:**
+        **NEOWATT CAPEX (manufacturing only, no launch):**
 
-        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
-
-
-        - $C_{tx}$, $C_{rx}$ = transmitter, receiver hardware cost
-
-        - $m_{tx}$, $m_{rx}$ = transmitter, receiver mass (kg)
-
-        - $L$ = launch cost per kg
-
-        - $C_{ground}$ = ground segment setup cost
+        $$C_{capex} = C_{tx} + C_{rx} + C_{ground}$$
 
 
-        **Annual OPEX:** $C_{ops}$ (operations, ground segment, maintenance)
+        - $C_{tx}$, $C_{rx}$ = TX, RX manufacturing cost
+
+        - $C_{ground}$ = ground segment (test, calibration)
 
 
-        **Customer saving vs incumbent:**
-
-        $$S = \frac{C_{inc} - W}{C_{inc}}$$
+        **Annual OPEX:** $C_{ops}$ (support staff, SW maintenance)
 
 
-        - $C_{inc}$ = incumbent cost per watt ($/W) for eclipse power via batteries + panel overbuild
+        **Customer''s total cost per watt:**
 
-        - $W$ = our price per watt
+        $$P_{cust} = \frac{S_{tx} + S_{rx}}{P}$$
 
 
-        **Viability test:** $S \geq$ required margin'
+        - $P$ = power delivered (W)
+
+
+        **Customer saving:** $S = (C_{inc} - P_{cust}) / C_{inc}$'
     incumbent:
       name: Battery oversizing + extra solar panels
       cost_per_W:
@@ -1546,42 +1591,71 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+      tx_sale_price_k:
+        value: 324
+        unit: $k
+        description: Sale price of TX payload to customer
+        justification: Manufacturing cost $180k with ~180% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 227
+          mode: 324
+          high: 486
+      rx_sale_price_k:
+        value: 96
+        unit: $k
+        description: Sale price of RX module to customer
+        justification: Manufacturing cost $60k with ~160% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 67
+          mode: 96
+          high: 144
+      annual_support_k:
+        value: 15
+        unit: $k/yr
+        description: Annual support, software updates, and licensing fee
+        justification: 'Recurring revenue stream: $15k/yr for mission support and SW updates.'
+        confidence: guessed
+        source: Analogous space hardware support contracts
+        distribution:
+          type: triangular
+          low: 8
+          mode: 15
+          high: 30
   covert_spacecraft:
     meta:
       name: Covert Spacecraft
       slug: covert_spacecraft
       description: 'Customer: defence and intelligence agencies (MOD, DoD, allied nations). Problem: solar arrays are the
-        dominant contributor to a satellite''s radar cross-section and optical brightness, making military satellites detectable.
-        Current stealth measures (coatings, orbit selection) are limited and compromise mission performance. Solution: NEOWATT
-        power beaming payload on a separate satellite delivers power to the covert spacecraft, which operates without solar
-        arrays. The customer integrates a low-profile PV receiver flush with the spacecraft body.'
+        dominant contributor to a satellite''s radar cross-section and optical brightness. Solution: NEOWATT sells TX and
+        RX hardware that the customer integrates on their own classified spacecraft. Architecture: defence customers will
+        not allow a third-party startup to operate power infrastructure for their classified assets. They buy hardware, integrate
+        it themselves, and operate it under their own security protocols. Hardware sale with a defence premium on pricing.'
       category: Defence
       time_horizon: Long-term
-      model_class: StealthModel
+      model_class: HardwareCovertModel
       notion_capabilities:
       - Reduced radar cross section
       - Reduced optical reflectivity
-      model_prose: Revenue is computed as power times price per watt, multiplied by a defence premium reflecting the strategic
-        value of low observability. Defence customers typically pay 1.5-4x commercial prices. The customer saving compares
-        our total cost per spacecraft against the current cost of stealth measures (coatings, operational constraints, structural
-        stiffening).
+      model_prose: Hardware sale model with defence premium. Revenue is TX+RX sale price multiplied by a defence WTP premium
+        (1.2-4x), annualised, plus support fees. NEOWATT's costs are manufacturing. Customer saving compares our per-spacecraft
+        hardware cost against the incumbent cost of stealth measures (coatings, operational constraints).
       model_maths: '**Annual revenue:**
 
-        $$R = P \times W \times k \times a$$
+        $$R = \frac{(S_{tx} + S_{rx}) \times k}{Y} + F_{support}$$
 
-
-        - $P$ = power delivered (W)
-
-        - $W$ = base willingness to pay per watt ($/W)
 
         - $k$ = defence WTP premium multiplier
 
-        - $a$ = system availability
 
+        **NEOWATT CAPEX (manufacturing):**
 
-        **CAPEX:**
-
-        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+        $$C_{capex} = C_{tx} + C_{rx} + C_{ground}$$
 
 
         **Annual OPEX:** $C_{ops}$
@@ -1589,12 +1663,10 @@ use_cases:
 
         **Customer saving:**
 
-        $$S = \frac{C_{inc} - W \times P}{C_{inc}}$$
+        $$S = \frac{C_{inc} - (S_{tx} + S_{rx})}{C_{inc}}$$
 
 
-        - $C_{inc}$ = incumbent cost of stealth measures per spacecraft ($)
-
-        - $W \times P$ = our cost to the customer per spacecraft (base WTP times power, without premium)'
+        - $C_{inc}$ = incumbent stealth measures cost per spacecraft ($)'
     incumbent:
       name: Orbit selection + coatings + operational constraints
       cost_per_spacecraft_k:
@@ -1798,49 +1870,77 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+      tx_sale_price_k:
+        value: 500
+        unit: $k
+        description: Sale price of TX payload to customer
+        justification: Manufacturing cost $250k with ~200% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 350
+          mode: 500
+          high: 750
+      rx_sale_price_k:
+        value: 126
+        unit: $k
+        description: Sale price of RX module to customer
+        justification: Manufacturing cost $70k with ~180% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 88
+          mode: 126
+          high: 189
+      annual_support_k:
+        value: 25
+        unit: $k/yr
+        description: Annual support, software updates, and licensing fee
+        justification: 'Recurring revenue stream: $25k/yr for mission support and SW updates.'
+        confidence: guessed
+        source: Analogous space hardware support contracts
+        distribution:
+          type: triangular
+          low: 12
+          mode: 25
+          high: 50
   onboard_power_delivery:
     meta:
       name: Onboard Power Delivery
       slug: onboard_power_delivery
       description: 'Customer: operators of orbital robotic systems -- truss assembly robots, free-flying inspection drones,
-        construction manipulators, refuelling vehicles. Problem: each robot needs its own solar arrays and batteries (adding
-        mass and failure modes), or must be physically tethered to a power bus via cabling (constraining range and assembly
-        geometry). Solution: NEOWATT transmitter on the host spacecraft or nearby platform beams power wirelessly to robots
-        within a few hundred km. Each robot carries a small PV receiver instead of solar arrays.'
+        construction manipulators, refuelling vehicles. Problem: each robot needs its own solar arrays and batteries, or must
+        be physically tethered via power cabling. Solution: NEOWATT sells a TX unit that mounts on the host spacecraft or
+        structure, and RX modules for each robot. The customer builds the host structure and integrates everything. Architecture:
+        the customer is building the host structure (e.g. orbital station, truss) and buying robots -- they purchase TX and
+        RX as components, not as a service.'
       category: Power Delivery
       time_horizon: Mid-term
-      model_class: StandardPowerModel
-      model_prose: 'Same model structure as LEO Duty Cycle Extension: revenue from price per watt times power delivered, adjusted
-        for duty cycle and availability. The customer saving compares our price per watt against the cost per watt of onboard
-        solar + battery or the cost of power cabling infrastructure.'
+      model_class: HardwareSaleModel
+      model_prose: Hardware sale model. NEOWATT sells TX for the host structure and RX modules for each robot. Revenue is
+        sale prices annualised plus support fees. Customer saving compares our hardware cost per watt against the cost of
+        onboard solar+battery on each robot or power cabling infrastructure.
       model_maths: '**Annual revenue:**
 
-        $$R = P \times W \times d \times a$$
+        $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
 
 
-        - $P$ = power delivered to robot/vehicle (W)
+        **NEOWATT CAPEX (manufacturing):**
 
-        - $W$ = willingness to pay per watt ($/W)
-
-        - $d$ = duty cycle (fraction of time requiring beamed power)
-
-        - $a$ = system availability
-
-
-        **CAPEX:**
-
-        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+        $$C_{capex} = C_{tx} + C_{rx} + C_{ground}$$
 
 
         **Annual OPEX:** $C_{ops}$
 
 
-        **Customer saving:**
+        **Customer''s cost per watt:**
 
-        $$S = \frac{C_{inc} - W}{C_{inc}}$$
+        $$P_{cust} = \frac{S_{tx} + S_{rx}}{P}$$
 
 
-        - $C_{inc}$ = incumbent cost per watt of robot onboard power or cabling ($/W)'
+        **Customer saving:** $S = (C_{inc} - P_{cust}) / C_{inc}$'
     incumbent:
       name: Onboard solar + battery or power cabling
       cost_per_W:
@@ -2036,15 +2136,52 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+      tx_sale_price_k:
+        value: 340
+        unit: $k
+        description: Sale price of TX payload to customer
+        justification: Manufacturing cost $200k with ~170% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 238
+          mode: 340
+          high: 510
+      rx_sale_price_k:
+        value: 120
+        unit: $k
+        description: Sale price of RX module to customer
+        justification: Manufacturing cost $80k with ~150% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 84
+          mode: 120
+          high: 180
+      annual_support_k:
+        value: 15
+        unit: $k/yr
+        description: Annual support, software updates, and licensing fee
+        justification: 'Recurring revenue stream: $15k/yr for mission support and SW updates.'
+        confidence: guessed
+        source: Analogous space hardware support contracts
+        distribution:
+          type: triangular
+          low: 8
+          mode: 15
+          high: 30
   lunar_deep_space_night:
     meta:
       name: Lunar and Deep-Space Night Power
       slug: lunar_deep_space_night
-      description: 'Customer: lunar surface mission operators (NASA Artemis, ESA, ispace, Astrobotic, Intuitive Machines)
-        and deep-space missions. Problem: the 14-day lunar night and permanently shadowed craters have no sunlight -- missions
-        must hibernate or carry RTGs (expensive, export-controlled, limited Pu-238 supply). Solution: NEOWATT transmitter
-        on a lunar orbiter or crater-rim relay station beams power to surface assets during darkness. Customer integrates
-        a dust-resistant PV receiver on the lander or rover.'
+      description: 'Customer: lunar surface mission operators (NASA Artemis, ESA, ispace, Astrobotic) and deep-space missions.
+        Problem: the 14-day lunar night and permanently shadowed craters have no sunlight. Solution: NEOWATT operates a TX
+        satellite on a lunar orbiter or crater-rim relay station, beaming power to surface assets during darkness. Architecture:
+        the lunar orbiter relay is shared infrastructure serving multiple surface missions over many years. It is more efficient
+        for NEOWATT to operate one relay than for each lander operator to launch their own. Service model with per-watt pricing.
+        Customer integrates a dust-resistant RX on their lander/rover.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
@@ -2287,13 +2424,14 @@ use_cases:
       name: PV-Free Spacecraft
       slug: array_free_spacecraft
       description: 'Customer: LEO constellation operators (OneWeb, Kuiper) and precision-pointing missions (Earth observation,
-        astronomy). Problem: deployable solar arrays add mass, volume, drag, and collision risk. They also force a Sun-pointing
-        constraint that competes with payload pointing, and introduce structural vibrations that degrade imaging quality.
-        Solution: customer satellite eliminates or reduces its solar arrays and carries a NEOWATT PV receiver instead. Power
-        is beamed from a separate NEOWATT transmitter satellite in a nearby orbit.'
+        astronomy). Problem: deployable solar arrays add mass, volume, drag, and collision risk, and force a Sun-pointing
+        constraint. Solution: NEOWATT sells a TX payload and RX modules. The customer designs their new satellite without
+        solar arrays, using the RX as the primary power input. The TX is integrated on a companion satellite or shared platform.
+        Architecture: this is a design-phase decision -- the customer commits when specifying their new satellite. They buy
+        and integrate the hardware themselves.'
       category: Spacecraft Design
       time_horizon: Mid-term
-      model_class: LightweightSCModel
+      model_class: HardwarePVFreeModel
       notion_capabilities:
       - Avoid over-sizing solar arrays
       - Smaller or no solar arrays
@@ -2301,39 +2439,32 @@ use_cases:
       - Reduced drag and collision risk
       - Reduced need for Sun-pointing
       - Improved pointing stability
-      model_prose: Revenue is the annual value to the customer of removing solar array mass. This is computed as the mass
-        saved times the sum of launch cost savings and array hardware cost savings, annualised over the system lifetime. The
-        customer saving compares the per-kg cost of our RX module against the per-kg cost of the solar arrays it replaces.
-      model_maths: '**Annual revenue (value of mass saved):**
+      model_prose: 'Hardware sale model. NEOWATT sells TX+RX to the customer. Revenue is the sale price annualised plus support
+        fees. The customer saving is measured per kg of solar array mass removed: our RX cost per kg saved vs the incumbent
+        solar array cost per kg.'
+      model_maths: '**Annual revenue:**
 
-        $$R = \frac{m_s \times (L + C_{array/kg})}{Y}$$
-
-
-        - $m_s$ = mass of removed solar arrays (kg)
-
-        - $L$ = launch cost per kg ($/kg)
-
-        - $C_{array/kg}$ = cost per kg of deployable solar array hardware ($/kg)
-
-        - $Y$ = amortisation years
+        $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
 
 
-        **CAPEX:**
+        **NEOWATT CAPEX (manufacturing):**
 
-        $$C_{capex} = C_{tx} + C_{rx} + (m_{tx} + m_{rx}) \times L + C_{ground}$$
+        $$C_{capex} = C_{tx} + C_{rx} + C_{ground}$$
 
 
         **Annual OPEX:** $C_{ops}$
 
 
-        **Customer saving:**
+        **Customer saving (per kg of array mass saved):**
 
-        $$S = \frac{C_{array/kg} - C_{rx/kg}}{C_{array/kg}}$$
+        $$S = \frac{C_{array/kg} - S_{rx} / m_s}{C_{array/kg}}$$
 
 
         - $C_{array/kg}$ = incumbent solar array cost per kg ($/kg)
 
-        - $C_{rx/kg}$ = our RX cost per kg of array mass saved: $(C_{rx} + m_{rx} \times L) / m_s$'
+        - $S_{rx}$ = RX sale price ($)
+
+        - $m_s$ = mass of removed solar arrays (kg)'
     incumbent:
       name: Standard onboard solar arrays
       array_cost_per_kg:
@@ -2539,16 +2670,52 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+      tx_sale_price_k:
+        value: 360
+        unit: $k
+        description: Sale price of TX payload to customer
+        justification: Manufacturing cost $200k with ~180% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 252
+          mode: 360
+          high: 540
+      rx_sale_price_k:
+        value: 75
+        unit: $k
+        description: Sale price of RX module to customer
+        justification: Manufacturing cost $50k with ~150% gross margin on hardware.
+        confidence: guessed
+        source: Target hardware margin for space components
+        distribution:
+          type: triangular
+          low: 52
+          mode: 75
+          high: 112
+      annual_support_k:
+        value: 12
+        unit: $k/yr
+        description: Annual support, software updates, and licensing fee
+        justification: 'Recurring revenue stream: $12k/yr for mission support and SW updates.'
+        confidence: guessed
+        source: Analogous space hardware support contracts
+        distribution:
+          type: triangular
+          low: 6
+          mode: 12
+          high: 24
   remote_power_delivery:
     meta:
       name: Remote Power Delivery
       slug: remote_power_delivery
-      description: 'Customer: orbital compute providers (Axiom, Varda, OrbitsEdge), modular satellite operators, and any architecture
-        where power generation and consumption have mismatched lifetimes. Problem: current spacecraft tightly couple solar
-        arrays with payload. When payload becomes obsolete (compute chips every 3-5 years), the still-functional arrays are
-        wasted. Conversely, array degradation retires a working payload. Solution: NEOWATT operates a long-lived solar generation
-        platform that beams power to short-lived consumer modules in a nearby orbit. Consumer modules carry only a PV receiver
-        and payload, no arrays.'
+      description: 'Customer: orbital compute providers (Axiom, Varda, OrbitsEdge), modular satellite operators. Problem:
+        current spacecraft tightly couple solar arrays with payload -- when payload becomes obsolete (compute chips every
+        3-5 years), arrays are wasted. Solution: NEOWATT operates a long-lived solar generation platform that beams power
+        to short-lived consumer modules in a nearby orbit. Architecture: the whole value proposition is decoupled infrastructure
+        with mismatched lifetimes. NEOWATT must operate the long-lived generation platform (15+ years) while customers swap
+        in/out consumer modules every 3-5 years. Service model is essential to the architecture.'
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
