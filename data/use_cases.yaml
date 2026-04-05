@@ -1,286 +1,4 @@
 use_cases:
-  leo_eclipse_power:
-    meta:
-      name: LEO Eclipse Power
-      slug: leo_eclipse_power
-      description: Beam power to LEO satellites during eclipse or anomaly recovery, reducing battery oversizing and extending
-        duty cycles.
-      category: Power Delivery
-      time_horizon: Near-term
-      model_class: StandardPowerModel
-      notion_capabilities:
-      - Power during eclipses and anomaly recovery
-      - Power resilience after partial degradation or damage
-      model_prose: 'LEO satellites spend ~35% of each orbit in Earth''s shadow (eclipse). During eclipse,
-
-        they rely entirely on batteries charged during the sunlit portion. This forces operators
-
-        to oversize solar arrays (to charge faster) and carry large battery packs, adding mass,
-
-        cost, and failure modes. NEOWATT beams power to satellites during eclipse from an
-
-        orbital transmitter or ground station, reducing or eliminating the need for battery
-
-        oversizing. The customer value is measured by comparing NEOWATT''s price per watt of
-
-        eclipse power against the incumbent cost of achieving the same capability through
-
-        extra solar panels and batteries.
-
-        '
-      model_maths: '**Revenue model (annual):**
-
-        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
-
-
-        Where:
-
-        - $P_{delivered}$ = power delivered at receiver (W)
-
-        - $WTP_{/W}$ = customer willingness to pay per watt ($/W)
-
-        - $\delta$ = duty cycle (fraction of orbit in eclipse, ~0.35)
-
-        - $\alpha$ = system availability (accounting for geometry, weather, maintenance)
-
-
-        **Cost model:**
-
-        $$C_{CAPEX} = C_{TX} + C_{RX} + (m_{TX} + m_{RX}) \times c_{launch} + C_{ground}$$
-
-        $$C_{OPEX/yr} = C_{ops}$$
-
-        $$C_{total} = C_{CAPEX} + C_{OPEX/yr} \times N_{years}$$
-
-
-        **Customer saving vs incumbent:**
-
-        $$S = \frac{C_{incumbent/W} - WTP_{/W}}{C_{incumbent/W}}$$
-
-
-        **Viability test:** $P(S \geq 50\%) \geq 60\%$ → GO
-
-        '
-    incumbent:
-      name: Battery oversizing + extra solar panels
-      cost_per_W:
-        value: 300
-        unit: $/W
-        description: Cost of delivering 1W during eclipse via batteries + panel overbuild
-        justification: Based on typical LEO smallsat battery costs ($500-1000/kg) and solar array costs ($500-2000/W at system
-          level). A 500W eclipse capability requires ~1.5kWh battery pack (~$15k-30k) plus oversized panels (~$50-100k), giving
-          roughly $200-500/W range. Central estimate $300/W from aggregated smallsat cost models.
-        distribution:
-          type: triangular
-          low: 200
-          mode: 300
-          high: 500
-        confidence: estimated
-        source: Industry cost models, smallsat vendor quotes
-    technical:
-      power_delivered_W:
-        value: 500
-        unit: W
-        description: Power delivered at receiver during eclipse
-        justification: Triangular distribution reflects uncertainty in customer power needs. 200W lower bound covers basic
-          housekeeping loads. 500W mode covers typical smallsat payload operation. 1500W high end covers larger satellites
-          or multi-customer scenarios.
-        confidence: estimated
-        source: NEOWATT internal engineering analysis
-      distance_km:
-        value: 600
-        unit: km
-        description: Typical LEO sat-to-sat or ground-to-LEO distance
-        justification: LEO altitudes range 400-1200km. 600km mode represents the densest orbital band. Lower bound 400km for
-          ISS-orbit customers, upper 1200km for sun-synchronous.
-        confidence: estimated
-        source: NEOWATT internal engineering analysis
-      link_efficiency:
-        value: 0.12
-        unit: fraction
-        description: End-to-end optical link efficiency (laser to electrical at RX)
-        justification: 'Chain: laser wall-plug efficiency (~40-50%) x optics/pointing losses (~50-70%) x atmospheric/vacuum
-          transmission (~80-95%) x PV conversion at laser wavelength (~40-50%). Combined gives 5-25% range. 12% mode is conservative
-          for current technology. Will improve as PV efficiency and laser tech advance.'
-        confidence: estimated
-        source: NEOWATT internal engineering analysis
-      duty_cycle:
-        value: 0.35
-        unit: fraction
-        description: Fraction of orbit in eclipse requiring beamed power
-        justification: Uniform distribution because eclipse fraction is geometrically determined by orbit altitude and inclination.
-          LEO eclipses typically 25-40% of orbit period. Uniform reflects that all values in this range are roughly equally
-          likely across the customer base.
-        confidence: estimated
-        source: NEOWATT internal engineering analysis
-      availability:
-        value: 0.9
-        unit: fraction
-        description: System availability accounting for weather, geometry, maintenance
-        justification: Triangular with mode at 0.90. Lower bound 0.75 accounts for early-stage reliability issues and orbital
-          geometry constraints (TX and RX must have line of sight). Upper bound 0.98 reflects mature constellation with redundancy.
-        confidence: estimated
-        source: NEOWATT internal engineering analysis
-    cost:
-      tx_hardware_k:
-        value: 180
-        unit: $k
-        description: Transmitter payload hardware cost
-        justification: Estimated from laser module ($30-80k), optics/telescope ($20-50k), power conditioning ($15-40k), thermal
-          management ($10-30k), PAT system ($25-60k), structure and integration ($20-50k). Total range $100-350k, mode $180k
-          for initial production.
-        distribution:
-          type: triangular
-          low: 100
-          mode: 180
-          high: 350
-        confidence: estimated
-        source: Component-level cost build-up from vendor quotes
-      rx_hardware_k:
-        value: 60
-        unit: $k
-        description: Receiver module cost
-        justification: PV array tuned to laser wavelength ($15-40k), power conditioning ($5-15k), optical concentrator/tracking
-          ($5-20k), integration ($5-15k). Simpler than TX. Range $30-120k, mode $60k.
-        distribution:
-          type: triangular
-          low: 30
-          mode: 60
-          high: 120
-        confidence: estimated
-        source: Component-level cost build-up from vendor quotes
-      tx_mass_kg:
-        value: 25
-        unit: kg
-        description: Transmitter payload mass
-        justification: Based on comparable laser communication terminals (5-15kg) scaled up for power levels. Includes laser,
-          optics, thermal, structure. 15-50kg range, 25kg mode for 500W-class system.
-        distribution:
-          type: triangular
-          low: 15
-          mode: 25
-          high: 50
-        confidence: estimated
-        source: Analogous laser terminal mass budgets
-      rx_mass_kg:
-        value: 8
-        unit: kg
-        description: Receiver module mass
-        justification: PV panel + power electronics + mounting structure. Must be light enough to justify vs battery mass
-          it replaces. 4-15kg range, 8kg mode.
-        distribution:
-          type: triangular
-          low: 4
-          mode: 8
-          high: 15
-        confidence: estimated
-        source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 30
-        unit: $k/yr
-        description: Annual operations and ground segment cost
-        justification: Covers mission control staffing share, software maintenance, ground station uplink time, insurance.
-          $15-60k range based on analogous small satellite operations.
-        distribution:
-          type: triangular
-          low: 15
-          mode: 30
-          high: 60
-        confidence: guessed
-        source: Analogous smallsat operations costs
-      ground_segment_k:
-        value: 50
-        unit: $k
-        description: One-time ground segment setup cost
-        justification: Ground station equipment, software development, testing and commissioning. Shared across multiple customers.
-          $20-100k range.
-        distribution:
-          type: triangular
-          low: 20
-          mode: 50
-          high: 100
-        confidence: guessed
-        source: Ground station infrastructure estimates
-    economic:
-      wtp_per_W:
-        value: 220
-        unit: $/W
-        description: Customer willingness to pay per watt of eclipse power
-        justification: Must be below incumbent cost ($300/W) to be attractive. $220/W mode gives ~27% saving. Lower bound
-          $100/W reflects highly price-sensitive customers. Upper bound $400/W reflects customers valuing operational continuity
-          and willing to pay near-incumbent prices.
-        distribution:
-          type: triangular
-          low: 100
-          mode: 220
-          high: 400
-        confidence: guessed
-        source: Must be below incumbent; no direct customer validation yet
-      amortization_years:
-        value: 7
-        unit: years
-        description: System operational lifetime
-        justification: Typical LEO satellite mission lifetime 5-10 years. 7 years mode reflects standard smallsat design life.
-          Triangular captures uncertainty in technology longevity.
-        distribution:
-          type: triangular
-          low: 5
-          mode: 7
-          high: 10
-        confidence: estimated
-        source: Standard satellite mission lifetime assumptions
-      addressable_units:
-        value: 200
-        unit: satellites
-        description: Number of LEO satellites that could benefit
-        justification: ~7000+ active LEO satellites as of 2025. Most are constellation sats with standardised power. Estimate
-          200-800 non-constellation LEO sats where bespoke power solutions matter. Lower bound 50 for very conservative early
-          market.
-        distribution:
-          type: triangular
-          low: 50
-          mode: 200
-          high: 800
-        confidence: estimated
-        source: UCS satellite database, market reports
-      penetration_rate:
-        value: 0.05
-        unit: fraction
-        description: Realistic near-term market capture rate
-        justification: Novel technology, long sales cycles in space industry. 1-5% penetration typical for new space services
-          in first 5 years. Upper bound 15% reflects optimistic scenario with strong customer pull.
-        distribution:
-          type: triangular
-          low: 0.01
-          mode: 0.05
-          high: 0.15
-        confidence: guessed
-        source: Analogous new space service adoption rates
-      launch_cost_per_kg:
-        value: 5000
-        unit: $/kg
-        description: Rideshare launch cost to orbit (Falcon 9 class)
-        justification: Current Falcon 9 rideshare ~$5000/kg. SpaceX Starship projected to reach $1000-2000/kg by 2030. Range
-          $2500-8000/kg covers near-term uncertainty. Will decline over time as reusability matures.
-        distribution: &id001
-          type: triangular
-          low: 2500
-          mode: 5000
-          high: 8000
-        trajectory:
-          years:
-          - 2025
-          - 2027
-          - 2030
-          - 2035
-          values:
-          - 5000
-          - 3500
-          - 2000
-          - 1000
-          description: Projected launch cost decline driven by Starship and reusability
-        confidence: measured
-        source: SpaceX Falcon 9 rideshare published pricing
   shadow_power:
     meta:
       name: Shadow / Low-Illumination Power
@@ -507,7 +225,11 @@ use_cases:
         description: Rideshare launch cost to orbit (Falcon 9 class)
         justification: Current Falcon 9 rideshare ~$5000/kg. SpaceX Starship projected to reach $1000-2000/kg by 2030. Range
           $2500-8000/kg covers near-term uncertainty. Will decline over time as reusability matures.
-        distribution: *id001
+        distribution: &id001
+          type: triangular
+          low: 2500
+          mode: 5000
+          high: 8000
         trajectory:
           years:
           - 2025
@@ -2731,27 +2453,297 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
-  in_orbit_servicing:
+  leo_duty_cycle_extension:
     meta:
-      name: In-Orbit Servicing Power
-      slug: in_orbit_servicing
-      description: Power for orbital tugs and servicer vehicles during transfer manoeuvres.
+      name: LEO Duty Cycle Extension
+      slug: leo_duty_cycle_extension
+      description: Beam power to LEO satellites during eclipse, extending operational duty cycles and reducing battery oversizing.
+      category: Power Delivery
+      time_horizon: Near-term
+      model_class: StandardPowerModel
+      notion_capabilities:
+      - Power during eclipses and anomaly recovery
+      - Power resilience after partial degradation or damage
+      model_prose: 'LEO satellites spend ~35% of each orbit in Earth''s shadow (eclipse). During eclipse,
+
+        they rely entirely on batteries charged during the sunlit portion. This forces operators
+
+        to oversize solar arrays (to charge faster) and carry large battery packs, adding mass,
+
+        cost, and failure modes. NEOWATT beams power to satellites during eclipse from an
+
+        orbital transmitter or ground station, reducing or eliminating the need for battery
+
+        oversizing. The customer value is measured by comparing NEOWATT''s price per watt of
+
+        eclipse power against the incumbent cost of achieving the same capability through
+
+        extra solar panels and batteries.
+
+        '
+      model_maths: '**Revenue model (annual):**
+
+        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
+
+
+        Where:
+
+        - $P_{delivered}$ = power delivered at receiver (W)
+
+        - $WTP_{/W}$ = customer willingness to pay per watt ($/W)
+
+        - $\delta$ = duty cycle (fraction of orbit in eclipse, ~0.35)
+
+        - $\alpha$ = system availability (accounting for geometry, weather, maintenance)
+
+
+        **Cost model:**
+
+        $$C_{CAPEX} = C_{TX} + C_{RX} + (m_{TX} + m_{RX}) \times c_{launch} + C_{ground}$$
+
+        $$C_{OPEX/yr} = C_{ops}$$
+
+        $$C_{total} = C_{CAPEX} + C_{OPEX/yr} \times N_{years}$$
+
+
+        **Customer saving vs incumbent:**
+
+        $$S = \frac{C_{incumbent/W} - WTP_{/W}}{C_{incumbent/W}}$$
+
+
+        **Viability test:** $P(S \geq 50\%) \geq 60\%$ → GO
+
+        '
+    incumbent:
+      name: Battery oversizing + extra solar panels
+      cost_per_W:
+        value: 300
+        unit: $/W
+        description: Cost of delivering 1W during eclipse via batteries + panel overbuild
+        justification: Based on typical LEO smallsat battery costs ($500-1000/kg) and solar array costs ($500-2000/W at system
+          level). A 500W eclipse capability requires ~1.5kWh battery pack (~$15k-30k) plus oversized panels (~$50-100k), giving
+          roughly $200-500/W range. Central estimate $300/W from aggregated smallsat cost models.
+        distribution:
+          type: triangular
+          low: 200
+          mode: 300
+          high: 500
+        confidence: estimated
+        source: Industry cost models, smallsat vendor quotes
+    technical:
+      power_delivered_W:
+        value: 500
+        unit: W
+        description: Power delivered at receiver during eclipse
+        justification: Triangular distribution reflects uncertainty in customer power needs. 200W lower bound covers basic
+          housekeeping loads. 500W mode covers typical smallsat payload operation. 1500W high end covers larger satellites
+          or multi-customer scenarios.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+      distance_km:
+        value: 600
+        unit: km
+        description: Typical LEO sat-to-sat or ground-to-LEO distance
+        justification: LEO altitudes range 400-1200km. 600km mode represents the densest orbital band. Lower bound 400km for
+          ISS-orbit customers, upper 1200km for sun-synchronous.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+      link_efficiency:
+        value: 0.12
+        unit: fraction
+        description: End-to-end optical link efficiency (laser to electrical at RX)
+        justification: 'Chain: laser wall-plug efficiency (~40-50%) x optics/pointing losses (~50-70%) x atmospheric/vacuum
+          transmission (~80-95%) x PV conversion at laser wavelength (~40-50%). Combined gives 5-25% range. 12% mode is conservative
+          for current technology. Will improve as PV efficiency and laser tech advance.'
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+      duty_cycle:
+        value: 0.35
+        unit: fraction
+        description: Fraction of orbit in eclipse requiring beamed power
+        justification: Uniform distribution because eclipse fraction is geometrically determined by orbit altitude and inclination.
+          LEO eclipses typically 25-40% of orbit period. Uniform reflects that all values in this range are roughly equally
+          likely across the customer base.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+      availability:
+        value: 0.9
+        unit: fraction
+        description: System availability accounting for weather, geometry, maintenance
+        justification: Triangular with mode at 0.90. Lower bound 0.75 accounts for early-stage reliability issues and orbital
+          geometry constraints (TX and RX must have line of sight). Upper bound 0.98 reflects mature constellation with redundancy.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+    cost:
+      tx_hardware_k:
+        value: 180
+        unit: $k
+        description: Transmitter payload hardware cost
+        justification: Estimated from laser module ($30-80k), optics/telescope ($20-50k), power conditioning ($15-40k), thermal
+          management ($10-30k), PAT system ($25-60k), structure and integration ($20-50k). Total range $100-350k, mode $180k
+          for initial production.
+        distribution:
+          type: triangular
+          low: 100
+          mode: 180
+          high: 350
+        confidence: estimated
+        source: Component-level cost build-up from vendor quotes
+      rx_hardware_k:
+        value: 60
+        unit: $k
+        description: Receiver module cost
+        justification: PV array tuned to laser wavelength ($15-40k), power conditioning ($5-15k), optical concentrator/tracking
+          ($5-20k), integration ($5-15k). Simpler than TX. Range $30-120k, mode $60k.
+        distribution:
+          type: triangular
+          low: 30
+          mode: 60
+          high: 120
+        confidence: estimated
+        source: Component-level cost build-up from vendor quotes
+      tx_mass_kg:
+        value: 25
+        unit: kg
+        description: Transmitter payload mass
+        justification: Based on comparable laser communication terminals (5-15kg) scaled up for power levels. Includes laser,
+          optics, thermal, structure. 15-50kg range, 25kg mode for 500W-class system.
+        distribution:
+          type: triangular
+          low: 15
+          mode: 25
+          high: 50
+        confidence: estimated
+        source: Analogous laser terminal mass budgets
+      rx_mass_kg:
+        value: 8
+        unit: kg
+        description: Receiver module mass
+        justification: PV panel + power electronics + mounting structure. Must be light enough to justify vs battery mass
+          it replaces. 4-15kg range, 8kg mode.
+        distribution:
+          type: triangular
+          low: 4
+          mode: 8
+          high: 15
+        confidence: estimated
+        source: PV receiver mass budget analysis
+      ops_cost_k_yr:
+        value: 30
+        unit: $k/yr
+        description: Annual operations and ground segment cost
+        justification: Covers mission control staffing share, software maintenance, ground station uplink time, insurance.
+          $15-60k range based on analogous small satellite operations.
+        distribution:
+          type: triangular
+          low: 15
+          mode: 30
+          high: 60
+        confidence: guessed
+        source: Analogous smallsat operations costs
+      ground_segment_k:
+        value: 50
+        unit: $k
+        description: One-time ground segment setup cost
+        justification: Ground station equipment, software development, testing and commissioning. Shared across multiple customers.
+          $20-100k range.
+        distribution:
+          type: triangular
+          low: 20
+          mode: 50
+          high: 100
+        confidence: guessed
+        source: Ground station infrastructure estimates
+    economic:
+      wtp_per_W:
+        value: 220
+        unit: $/W
+        description: Customer willingness to pay per watt of eclipse power
+        justification: Must be below incumbent cost ($300/W) to be attractive. $220/W mode gives ~27% saving. Lower bound
+          $100/W reflects highly price-sensitive customers. Upper bound $400/W reflects customers valuing operational continuity
+          and willing to pay near-incumbent prices.
+        distribution:
+          type: triangular
+          low: 100
+          mode: 220
+          high: 400
+        confidence: guessed
+        source: Must be below incumbent; no direct customer validation yet
+      amortization_years:
+        value: 7
+        unit: years
+        description: System operational lifetime
+        justification: Typical LEO satellite mission lifetime 5-10 years. 7 years mode reflects standard smallsat design life.
+          Triangular captures uncertainty in technology longevity.
+        distribution:
+          type: triangular
+          low: 5
+          mode: 7
+          high: 10
+        confidence: estimated
+        source: Standard satellite mission lifetime assumptions
+      addressable_units:
+        value: 200
+        unit: satellites
+        description: Number of LEO satellites that could benefit
+        justification: ~7000+ active LEO satellites as of 2025. Most are constellation sats with standardised power. Estimate
+          200-800 non-constellation LEO sats where bespoke power solutions matter. Lower bound 50 for very conservative early
+          market.
+        distribution:
+          type: triangular
+          low: 50
+          mode: 200
+          high: 800
+        confidence: estimated
+        source: UCS satellite database, market reports
+      penetration_rate:
+        value: 0.05
+        unit: fraction
+        description: Realistic near-term market capture rate
+        justification: Novel technology, long sales cycles in space industry. 1-5% penetration typical for new space services
+          in first 5 years. Upper bound 15% reflects optimistic scenario with strong customer pull.
+        distribution:
+          type: triangular
+          low: 0.01
+          mode: 0.05
+          high: 0.15
+        confidence: guessed
+        source: Analogous new space service adoption rates
+      launch_cost_per_kg:
+        value: 5000
+        unit: $/kg
+        description: Rideshare launch cost to orbit (Falcon 9 class)
+        justification: Current Falcon 9 rideshare ~$5000/kg. SpaceX Starship projected to reach $1000-2000/kg by 2030. Range
+          $2500-8000/kg covers near-term uncertainty. Will decline over time as reusability matures.
+        distribution: *id001
+        trajectory:
+          years:
+          - 2025
+          - 2027
+          - 2030
+          - 2035
+          values:
+          - 5000
+          - 3500
+          - 2000
+          - 1000
+          description: Projected launch cost decline driven by Starship and reusability
+        confidence: measured
+        source: SpaceX Falcon 9 rideshare published pricing
+  remote_power_delivery:
+    meta:
+      name: Remote Power Delivery
+      slug: remote_power_delivery
+      description: Wireless power delivery to robotic systems, orbital tugs, and servicer vehicles. Eliminates the need for
+        PV arrays on robots or power cabling along structures (e.g. truss assembly robots, free-flying inspection drones).
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
-      model_prose: 'Orbital servicing vehicles (tugs, inspectors, refuellers) need power during long
-
-        transfer orbits where they may pass through extended eclipse periods or need
-
-        high power for electric propulsion. These vehicles are mass-constrained and
-
-        every kg spent on solar arrays is a kg not available for propellant or payload.
-
-        NEOWATT beams power to servicers during transfer, reducing their onboard power
-
-        system requirements and improving mass budgets for actual servicing capability.
-
-        '
+      model_prose: Robotic systems in orbit -- truss assembly robots, free-flying inspectors, orbital tugs -- currently need
+        their own solar arrays and batteries, adding mass, complexity, and failure modes. Power cabling along large structures
+        is heavy and constrains assembly geometry. NEOWATT beams power wirelessly to these systems, eliminating onboard PV
+        and cabling. The customer value is mass savings on each robot/vehicle plus operational flexibility from untethered
+        power delivery.
       model_maths: '**Revenue model:** Standard power delivery.
 
         $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
@@ -2763,7 +2755,7 @@ use_cases:
 
         '
     incumbent:
-      name: Onboard solar + battery on servicer vehicle
+      name: Onboard solar + battery or power cabling
       cost_per_W:
         value: 400
         unit: $/W
@@ -2957,3 +2949,224 @@ use_cases:
           description: Projected launch cost decline driven by Starship and reusability
         confidence: measured
         source: SpaceX Falcon 9 rideshare published pricing
+  onboard_power_generation:
+    meta:
+      name: Onboard Power Generation
+      slug: onboard_power_generation
+      description: Dedicated NEOWATT power generation satellite that converts solar energy to laser and beams to multiple
+        customers. Operates as orbital power plant infrastructure.
+      category: Power Infrastructure
+      time_horizon: Long-term
+      model_class: StandardPowerModel
+      model_prose: 'Rather than adding power beaming as a secondary payload, this use case envisions a dedicated power generation
+        satellite -- an orbital power plant. Large solar arrays generate electricity, converted to laser and beamed to multiple
+        customer spacecraft. This is the infrastructure play: NEOWATT builds and operates the power grid, customers subscribe.
+        Distinct from Power-as-a-Service (which retrofits existing platforms) in that this is purpose-built generation infrastructure
+        at scale.'
+      model_maths: '**Revenue model (annual):**
+
+        $$R = P_{delivered} \times WTP_{/W} \times \delta \times \alpha$$
+
+
+        **Cost model:** Same CAPEX/OPEX structure but with larger TX platform and dedicated solar generation capacity.
+
+
+        **Key differentiator:** Higher CAPEX (purpose-built satellite) but lower per-customer cost at scale due to dedicated
+        design optimisation.'
+    incumbent:
+      name: Self-provisioned onboard solar arrays per satellite
+      cost_per_W:
+        value: 250
+        unit: $/W
+        description: Average cost per watt of onboard solar power across satellite classes
+        justification: Weighted average across LEO/MEO/GEO satellite power subsystem costs. Ranges from $150/W for large GEO
+          arrays to $400/W for small deployable arrays. $250/W mode represents mid-market.
+        confidence: estimated
+        source: Industry solar array cost surveys, vendor quotes
+        distribution:
+          type: triangular
+          low: 150
+          mode: 250
+          high: 400
+    technical:
+      power_delivered_W:
+        value: 5000
+        unit: W
+        description: Total power output of the generation satellite
+        justification: 5kW initial capacity, scalable to 50kW+. Serves 5-10 customer spacecraft.
+        confidence: estimated
+        source: NEOWATT internal architecture study
+      distance_km:
+        value: 800
+        unit: km
+        description: Average distance to customer spacecraft
+        justification: LEO constellation geometry. 300-2000km range.
+        confidence: estimated
+        source: Orbital mechanics analysis
+      link_efficiency:
+        value: 0.1
+        unit: fraction
+        description: End-to-end link efficiency
+        justification: Moderate range, standard optical link budget.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+      duty_cycle:
+        value: 0.6
+        unit: fraction
+        description: Fraction of time actively beaming power
+        justification: Dedicated platform, high utilisation. Limited by orbital geometry and eclipse.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+      availability:
+        value: 0.92
+        unit: fraction
+        description: System availability
+        justification: Purpose-built platform with redundancy.
+        confidence: estimated
+        source: NEOWATT internal engineering analysis
+    cost:
+      tx_hardware_k:
+        value: 500
+        unit: $k
+        description: Dedicated power generation satellite TX system
+        justification: Purpose-built satellite with large solar arrays, high-power laser, beam steering. $250-1000k.
+        confidence: guessed
+        source: Bottom-up cost estimate, early stage
+        distribution:
+          type: triangular
+          low: 250
+          mode: 500
+          high: 1000
+      rx_hardware_k:
+        value: 40
+        unit: $k
+        description: Standardised RX module per customer
+        justification: Mass-produced receiver. $20-80k.
+        confidence: estimated
+        source: Component-level cost build-up
+        distribution:
+          type: triangular
+          low: 20
+          mode: 40
+          high: 80
+      tx_mass_kg:
+        value: 150
+        unit: kg
+        description: Dedicated power satellite mass
+        justification: Includes solar generation, power conditioning, laser, optics. 80-300kg.
+        confidence: guessed
+        source: Analogous small satellite mass budgets
+        distribution:
+          type: triangular
+          low: 80
+          mode: 150
+          high: 300
+      rx_mass_kg:
+        value: 6
+        unit: kg
+        description: RX mass per customer
+        justification: Standard lightweight receiver. 3-12kg.
+        confidence: estimated
+        source: PV receiver mass budget analysis
+        distribution:
+          type: triangular
+          low: 3
+          mode: 6
+          high: 12
+      ops_cost_k_yr:
+        value: 80
+        unit: $k/yr
+        description: Annual operations for dedicated platform
+        justification: 'Higher ops: dedicated mission control, multi-customer scheduling. $40-150k.'
+        confidence: guessed
+        source: Analogous smallsat operations costs
+        distribution:
+          type: triangular
+          low: 40
+          mode: 80
+          high: 150
+      ground_segment_k:
+        value: 120
+        unit: $k
+        description: Ground infrastructure
+        justification: Mission control, customer management, telemetry. $50-200k.
+        confidence: guessed
+        source: Ground station infrastructure estimates
+        distribution:
+          type: triangular
+          low: 50
+          mode: 120
+          high: 200
+    economic:
+      wtp_per_W:
+        value: 180
+        unit: $/W
+        description: Customer WTP per watt from dedicated power infrastructure
+        justification: Competes with standard onboard solar. Must undercut $250/W incumbent. $80-300/W.
+        confidence: guessed
+        source: Must be below incumbent; no direct validation yet
+        distribution:
+          type: triangular
+          low: 80
+          mode: 180
+          high: 300
+      amortization_years:
+        value: 12
+        unit: years
+        description: Platform operational lifetime
+        justification: Purpose-built for long life. 8-15 years.
+        confidence: estimated
+        source: Standard satellite mission lifetime assumptions
+        distribution:
+          type: triangular
+          low: 8
+          mode: 12
+          high: 15
+      addressable_units:
+        value: 500
+        unit: satellites
+        description: Potential customer spacecraft
+        justification: Any LEO satellite that could benefit from external power.
+        confidence: guessed
+        source: UCS satellite database, market reports
+        distribution:
+          type: triangular
+          low: 100
+          mode: 500
+          high: 2000
+      penetration_rate:
+        value: 0.02
+        unit: fraction
+        description: Market capture rate
+        justification: Infrastructure play requires scale. Very long sales cycle. 0.5-8%.
+        confidence: guessed
+        source: Analogous new space service adoption rates
+        distribution:
+          type: triangular
+          low: 0.005
+          mode: 0.02
+          high: 0.08
+      launch_cost_per_kg:
+        value: 5000
+        unit: $/kg
+        description: Rideshare launch cost to orbit
+        justification: Current Falcon 9 rideshare. Will decline over time.
+        confidence: measured
+        source: SpaceX Falcon 9 rideshare published pricing
+        distribution:
+          type: triangular
+          low: 2500
+          mode: 5000
+          high: 8000
+        trajectory:
+          years:
+          - 2025
+          - 2027
+          - 2030
+          - 2035
+          values:
+          - 5000
+          - 3500
+          - 2000
+          - 1000
+          description: Projected launch cost decline driven by Starship and reusability

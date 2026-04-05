@@ -325,7 +325,7 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
     items.append("Ground Segment"); vals.append(ground)
 
     opex_total = e["opex_yr"] * e["amort_years"]
-    items.append(f"OPEX ({e['amort_years']:.0f}yr)")
+    items.append(f"Total OPEX\n({e['amort_years']:.0f}yr lifetime)")
     vals.append(opex_total)
 
     fig = go.Figure(go.Bar(

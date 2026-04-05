@@ -115,7 +115,7 @@ else:
     if ss_key not in st.session_state:
         st.session_state[ss_key] = {}
 
-    tabs_list = ["Overview", "Deep Dive", "Inputs & Distributions",
+    tabs_list = ["Overview", "MC Distributions", "Inputs & Distributions",
                  "Sensitivity", "Comparison"]
     if time_dep:
         tabs_list.append("Time Dependency")
