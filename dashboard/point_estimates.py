@@ -258,7 +258,6 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
             "Gross Margin": f"{e['gross_margin'] * 100:.0f}%",
             "Cust. Saving": f"{e['customer_saving'] * 100:+.0f}%",
             "Cost/W": f"${e['cost_per_W']:,.0f}",
-            "Breakeven": f"${e['breakeven_price']:,.0f}" if e["breakeven_price"] else "N/A",
         })
 
     df = pd.DataFrame(rows)
@@ -284,7 +283,7 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
                 st.markdown(model_maths)
 
     # Key metrics
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.metric("CAPEX", f"${e['capex']:,.0f}")
     with col2:
@@ -295,11 +294,6 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
         st.metric("Customer Saving", f"{e['customer_saving'] * 100:+.0f}%")
     with col5:
         st.metric("Cost/W", f"${e['cost_per_W']:,.0f}")
-    with col6:
-        if e["breakeven_price"] is not None:
-            st.metric("Breakeven Price", f"${e['breakeven_price']:,.0f}")
-        else:
-            st.metric("Breakeven Price", "N/A")
 
     # Cost waterfall
     st.markdown("#### Cost Breakdown")

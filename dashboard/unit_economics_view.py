@@ -59,7 +59,6 @@ def render_unit_economics(use_cases: dict, global_params: dict, required_margin:
             "cost_per_W": e["cost_per_W"],
             "rev_per_tx": rev_per_tx,
             "amort_years": e["amort_years"],
-            "breakeven_price": e["breakeven_price"],
         })
 
     # Table
@@ -75,7 +74,6 @@ def render_unit_economics(use_cases: dict, global_params: dict, required_margin:
             "CLV": f"${r['clv']:,.0f}",
             "Gross Margin": f"{r['gross_margin'] * 100:.0f}%",
             "Payback (yr)": f"{r['payback']:.1f}" if r["payback"] < 100 else "Never",
-            "Breakeven": f"${r['breakeven_price']:,.0f}" if r["breakeven_price"] else "N/A",
         })
 
     df = pd.DataFrame(table)
