@@ -110,8 +110,8 @@ use_cases:
         value: 120
         unit: $k
         description: Ground-based transmitter cost
-        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial laser
-          + tracking system. $60-250k.
+        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial
+          laser + tracking system. $60-250k.
         distribution:
           type: triangular
           low: 60
@@ -156,18 +156,6 @@ use_cases:
           high: 10
         confidence: estimated
         source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 20
-        unit: $k/yr
-        description: Annual operations
-        justification: Ground-based system has low ops cost – site maintenance, power, staffing. $10-45k.
-        distribution:
-          type: triangular
-          low: 10
-          mode: 20
-          high: 45
-        confidence: guessed
-        source: Analogous smallsat operations costs
       ground_segment_k:
         value: 80
         unit: $k
@@ -180,6 +168,18 @@ use_cases:
           high: 150
         confidence: guessed
         source: Ground station infrastructure estimates
+      support_cost_k_yr:
+        value: 5
+        unit: $k/yr
+        description: Internal cost of providing customer support and software updates
+        justification: Engineering staff time for support tickets, software maintenance, documentation. $5k/yr estimate.
+        confidence: guessed
+        source: Internal staffing cost estimate
+        distribution:
+          type: triangular
+          low: 2
+          mode: 5
+          high: 10
     economic:
       wtp_per_W:
         value: 140
@@ -471,19 +471,6 @@ use_cases:
           high: 15
         confidence: estimated
         source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 30
-        unit: $k/yr
-        description: Annual operations and ground segment cost
-        justification: Covers mission control staffing share, software maintenance, ground station uplink time, insurance.
-          $15-60k range based on analogous small satellite operations.
-        distribution:
-          type: triangular
-          low: 15
-          mode: 30
-          high: 60
-        confidence: guessed
-        source: Analogous smallsat operations costs
       ground_segment_k:
         value: 50
         unit: $k
@@ -497,6 +484,18 @@ use_cases:
           high: 100
         confidence: guessed
         source: Ground station infrastructure estimates
+      support_cost_k_yr:
+        value: 7
+        unit: $k/yr
+        description: Internal cost of providing customer support and software updates
+        justification: Engineering staff time for support tickets, software maintenance, documentation. $7k/yr estimate.
+        confidence: guessed
+        source: Internal staffing cost estimate
+        distribution:
+          type: triangular
+          low: 3
+          mode: 7
+          high: 14
     economic:
       wtp_per_W:
         value: 220
@@ -774,18 +773,6 @@ use_cases:
           high: 12
         confidence: estimated
         source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 35
-        unit: $k/yr
-        description: Annual operations cost
-        justification: Burst scheduling adds operational complexity over continuous service. $15-70k range.
-        distribution:
-          type: triangular
-          low: 15
-          mode: 35
-          high: 70
-        confidence: guessed
-        source: Analogous smallsat operations costs
       ground_segment_k:
         value: 40
         unit: $k
@@ -798,6 +785,18 @@ use_cases:
           high: 80
         confidence: guessed
         source: Ground station infrastructure estimates
+      support_cost_k_yr:
+        value: 8
+        unit: $k/yr
+        description: Internal cost of providing customer support and software updates
+        justification: Engineering staff time for support tickets, software maintenance, documentation. $8k/yr estimate.
+        confidence: guessed
+        source: Internal staffing cost estimate
+        distribution:
+          type: triangular
+          low: 4
+          mode: 8
+          high: 16
     economic:
       wtp_per_kWh:
         value: 500
@@ -1321,18 +1320,6 @@ use_cases:
         justification: Must be compact to fit servicer. 6-25kg.
         confidence: estimated
         source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 40
-        unit: $k/yr
-        distribution:
-          type: triangular
-          low: 20
-          mode: 40
-          high: 80
-        description: Annual ops
-        justification: Coordinated ops with servicer mission.
-        confidence: guessed
-        source: Analogous smallsat operations costs
       ground_segment_k:
         value: 50
         unit: $k
@@ -1345,6 +1332,18 @@ use_cases:
         justification: Standard ground infrastructure.
         confidence: guessed
         source: Ground station infrastructure estimates
+      support_cost_k_yr:
+        value: 10
+        unit: $k/yr
+        description: Internal cost of providing customer support and software updates
+        justification: Engineering staff time for support tickets, software maintenance, documentation. $10k/yr estimate.
+        confidence: guessed
+        source: Internal staffing cost estimate
+        distribution:
+          type: triangular
+          low: 5
+          mode: 10
+          high: 20
     economic:
       wtp_per_W:
         value: 300
@@ -1628,18 +1627,6 @@ use_cases:
           2-10kg.
         confidence: estimated
         source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 25
-        unit: $k/yr
-        distribution:
-          type: triangular
-          low: 12
-          mode: 25
-          high: 50
-        description: Annual operations
-        justification: Standard LEO ops. $12-50k.
-        confidence: guessed
-        source: Analogous smallsat operations costs
       ground_segment_k:
         value: 40
         unit: $k
@@ -1652,6 +1639,18 @@ use_cases:
         justification: Standard ground setup. $15-80k.
         confidence: guessed
         source: Ground station infrastructure estimates
+      support_cost_k_yr:
+        value: 6
+        unit: $k/yr
+        description: Internal cost of providing customer support and software updates
+        justification: Engineering staff time for support tickets, software maintenance, documentation. $6k/yr estimate.
+        confidence: guessed
+        source: Internal staffing cost estimate
+        distribution:
+          type: triangular
+          low: 3
+          mode: 6
+          high: 12
     economic:
       amortization_years:
         value: 7
@@ -2952,18 +2951,6 @@ use_cases:
         justification: Low-profile design. 3-14kg.
         confidence: estimated
         source: PV receiver mass budget analysis
-      ops_cost_k_yr:
-        value: 40
-        unit: $k/yr
-        distribution:
-          type: triangular
-          low: 20
-          mode: 40
-          high: 80
-        description: Annual ops
-        justification: Secure operations add overhead.
-        confidence: guessed
-        source: Analogous smallsat operations costs
       ground_segment_k:
         value: 60
         unit: $k
@@ -2976,6 +2963,18 @@ use_cases:
         justification: Secure ground infrastructure.
         confidence: guessed
         source: Ground station infrastructure estimates
+      support_cost_k_yr:
+        value: 10
+        unit: $k/yr
+        description: Internal cost of providing customer support and software updates
+        justification: Engineering staff time for support tickets, software maintenance, documentation. $10k/yr estimate.
+        confidence: guessed
+        source: Internal staffing cost estimate
+        distribution:
+          type: triangular
+          low: 5
+          mode: 10
+          high: 20
     economic:
       wtp_per_W:
         value: 300

@@ -2,13 +2,13 @@
 Hardware sale model – NEOWATT sells TX and RX payload hardware to the customer.
 
 The customer integrates the hardware on their own satellite/platform and pays
-for their own launch. NEOWATT's costs are manufacturing; revenue is the sale
-price plus an optional annual support/licensing fee.
+for their own launch. NEOWATT's costs are manufacturing and test/calibration;
+revenue is the sale price plus an annual support/licensing fee.
 
 Revenue = (TX sale price + RX sale price) / amortisation + annual support fee
-Cost = TX manufacturing + RX manufacturing + ground segment (test/calibration) + annual ops
-No launch costs for NEOWATT (customer pays for their own launch).
-Incumbent comparison = incumbent $/W vs our hardware cost per watt to the customer.
+Cost = TX manufacturing + RX manufacturing + ground segment (test/calibration)
+       + internal cost of providing annual support
+No launch costs, no satellite operations (customer operates everything).
 """
 
 import numpy as np
@@ -30,9 +30,13 @@ class HardwareSaleModel(UseCaseModel):
         ground = sample(cost["ground_segment_k"], n, rng) * 1000
 
         capex = tx_hw + rx_hw + ground
-        annual_opex = sample(cost["ops_cost_k_yr"], n, rng) * 1000
 
-        return capex, annual_opex
+        # No satellite operations cost. Only cost of providing support service.
+        support_cost = sample(
+            self.params.get("cost", {}).get("support_cost_k_yr", {"value": 5}), n, rng
+        ) * 1000
+
+        return capex, support_cost
 
     def compute_annual_revenue(self, n, rng):
         econ = self.params["economic"]

@@ -46,8 +46,11 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
         # Service: NEOWATT pays manufacturing + launch
         capex = tx_hw + rx_hw + (tx_mass + rx_mass) * launch_cost + ground
 
-    # Annual OPEX
-    opex_yr = get_param_value(cost.get("ops_cost_k_yr", {"value": 0})) * 1000
+    # Annual OPEX / support cost
+    if is_hardware_sale:
+        opex_yr = get_param_value(cost.get("support_cost_k_yr", {"value": 5})) * 1000
+    else:
+        opex_yr = get_param_value(cost.get("ops_cost_k_yr", {"value": 0})) * 1000
 
     # Amortization
     amort = get_param_value(econ.get("amortization_years", {"value": 7}))
@@ -378,7 +381,11 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
     items.append("Ground Segment"); vals.append(ground_val); colors.append(COLORS["primary"])
 
     opex_total = e["opex_yr"] * e["amort_years"]
-    items.append(f"Total OPEX\n({e['amort_years']:.0f}yr lifetime)")
+    if is_hw_sale:
+        opex_label = f"Support Cost\n({e['amort_years']:.0f}yr)"
+    else:
+        opex_label = f"Total OPEX\n({e['amort_years']:.0f}yr lifetime)"
+    items.append(opex_label)
     vals.append(opex_total)
     colors.append(COLORS["marginal"])
 

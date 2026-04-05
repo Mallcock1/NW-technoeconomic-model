@@ -23,9 +23,12 @@ class HardwareCovertModel(UseCaseModel):
         ground = sample(cost["ground_segment_k"], n, rng) * 1000
 
         capex = tx_hw + rx_hw + ground
-        annual_opex = sample(cost["ops_cost_k_yr"], n, rng) * 1000
 
-        return capex, annual_opex
+        support_cost = sample(
+            self.params.get("cost", {}).get("support_cost_k_yr", {"value": 5}), n, rng
+        ) * 1000
+
+        return capex, support_cost
 
     def compute_annual_revenue(self, n, rng):
         econ = self.params["economic"]
