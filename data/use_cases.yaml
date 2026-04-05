@@ -629,8 +629,8 @@ use_cases:
         value: 120
         unit: $k
         description: Ground-based transmitter cost
-        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial laser
-          + tracking system. $60-250k.
+        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial
+          laser + tracking system. $60-250k.
         distribution:
           type: triangular
           low: 60
@@ -2242,7 +2242,7 @@ use_cases:
         source: SpaceX Falcon 9 rideshare published pricing
   array_free_spacecraft:
     meta:
-      name: Array-Free Spacecraft Design
+      name: PV-Free Spacecraft
       slug: array_free_spacecraft
       description: Reduce or eliminate onboard solar arrays, saving launch mass, volume, and drag, while also freeing the
         attitude budget from Sun-pointing constraints. Improves pointing stability for EO and astronomy missions.
