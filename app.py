@@ -35,16 +35,17 @@ mode = settings["mode"]
 selected = settings["selected_slug"]
 time_dep = settings["time_dependent"]
 
+# ── Shared imports (used in both modes) ─────────────────────────────────────
+from dashboard.incumbent_view import render_incumbent_view
+from dashboard.unit_economics_view import render_unit_economics
+from dashboard.portfolio_view import render_portfolio
+
 # ── Point Estimates mode ────────────────────────────────────────────────────
 if mode == "Point Estimates":
     from dashboard.point_estimates import render_point_estimates
     from dashboard.inputs_point import render_inputs_point
     from dashboard.comparison_view import render_comparison_point
-    from dashboard.incumbent_view import render_incumbent_view
-    from dashboard.unit_economics_view import render_unit_economics
-    from dashboard.portfolio_view import render_portfolio
 
-    # Initialise override storage in session_state
     ss_key = f"overrides_pt_{selected}"
     if ss_key not in st.session_state:
         st.session_state[ss_key] = {}
@@ -61,7 +62,7 @@ if mode == "Point Estimates":
         if overrides:
             st.session_state[ss_key] = overrides
 
-    # Apply overrides to use_cases for this run
+    # Apply overrides
     active_overrides = st.session_state.get(ss_key, {})
     uc_with_overrides = copy.deepcopy(use_cases)
     if active_overrides:
@@ -72,8 +73,8 @@ if mode == "Point Estimates":
                     uc_with_overrides[selected][group][pname]["value"] = new_val
 
     with tabs[0]:  # Overview
-        settings_with_ov = {**settings, "overrides": {}}
-        render_point_estimates(uc_with_overrides, modified_gp, settings_with_ov)
+        render_point_estimates(uc_with_overrides, modified_gp,
+                               {**settings, "overrides": {}})
 
     with tabs[2]:  # Unit Economics
         render_unit_economics(uc_with_overrides, modified_gp, settings["required_margin"])
@@ -91,7 +92,7 @@ if mode == "Point Estimates":
         from dashboard.temporal_view import render_temporal_point
         from neowatt.temporal import run_time_series_point
 
-        with tabs[6]:  # Time Dependency
+        with tabs[6]:
             with st.spinner("Computing time-dependent results..."):
                 ts_results = run_time_series_point(
                     uc_with_overrides, modified_gp,
@@ -110,25 +111,25 @@ else:
     from neowatt.monte_carlo import run_all_use_cases
     from neowatt.sensitivity import tornado_analysis
 
-    # Initialise override storage
     ss_key = f"overrides_mc_{selected}"
     if ss_key not in st.session_state:
         st.session_state[ss_key] = {}
 
-    tabs_list = ["Overview", "MC Distributions", "Inputs & Distributions",
-                 "Sensitivity", "Comparison"]
+    tabs_list = ["Overview", "Distributions", "Input Parameters",
+                 "Sensitivity", "Unit Economics", "Portfolio",
+                 "Incumbents", "Comparison"]
     if time_dep:
         tabs_list.append("Time Dependency")
 
     tabs = st.tabs(tabs_list)
 
-    # Collect overrides from inputs tab
-    with tabs[2]:  # Inputs & Distributions
+    # Collect overrides from input parameters tab
+    with tabs[2]:  # Input Parameters
         overrides = render_inputs(use_cases[selected], selected)
         if overrides:
             st.session_state[ss_key] = overrides
 
-    # Build overrides dict for MC engine
+    # Build overrides for MC engine
     active_overrides = st.session_state.get(ss_key, {})
     mc_overrides = {}
     if active_overrides:
@@ -144,9 +145,10 @@ else:
     with tabs[0]:  # Overview
         render_overview(results, settings["required_margin"])
 
-    with tabs[1]:  # Deep Dive
+    with tabs[1]:  # Distributions
         if selected in results:
-            render_deep_dive(results[selected], use_cases[selected], settings["required_margin"])
+            render_deep_dive(results[selected], use_cases[selected],
+                             settings["required_margin"])
 
     with tabs[3]:  # Sensitivity
         if selected in results:
@@ -168,14 +170,23 @@ else:
                 )
             render_sensitivity(tornado, base_metric_name=metric_labels[metric_choice])
 
-    with tabs[4]:  # Comparison
+    with tabs[4]:  # Unit Economics
+        render_unit_economics(use_cases, modified_gp, settings["required_margin"])
+
+    with tabs[5]:  # Portfolio
+        render_portfolio(use_cases, modified_gp, settings["required_margin"])
+
+    with tabs[6]:  # Incumbents
+        render_incumbent_view(use_cases)
+
+    with tabs[7]:  # Comparison
         render_comparison(results)
 
     if time_dep:
         from dashboard.temporal_view import render_temporal_mc
         from neowatt.temporal import run_time_series_mc
 
-        with tabs[5]:  # Time Dependency
+        with tabs[8]:
             with st.spinner("Computing time-dependent MC results..."):
                 mc_ts = run_time_series_mc(
                     use_cases, modified_gp,

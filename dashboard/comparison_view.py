@@ -69,7 +69,7 @@ def render_comparison_point(use_cases: dict, global_params: dict, required_margi
     """Point-estimate comparison: customer saving vs gross margin scatter."""
     from dashboard.point_estimates import _compute_point_estimate
 
-    st.markdown("### Use Case Comparison (Point Estimates)")
+    st.markdown("### Use Case Comparison")
     st.caption("X = customer saving %. Y = gross margin %. Color = decision.")
 
     names = []

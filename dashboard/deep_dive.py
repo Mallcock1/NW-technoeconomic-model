@@ -19,7 +19,7 @@ def _esc_prose(text: str) -> str:
 
 def render_deep_dive(result: ModelResult, uc_params: dict, required_margin: float):
     dec = result.decision
-    st.markdown(f"## {decision_emoji(dec.label)} Deep Dive: {result.use_case_name}")
+    st.markdown(f"## {decision_emoji(dec.label)} {result.use_case_name} – Output Distributions")
 
     # Description and incumbent
     meta = uc_params["meta"]

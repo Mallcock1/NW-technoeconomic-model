@@ -16,7 +16,7 @@ def render_inputs_point(uc_params: dict, slug: str) -> dict:
 
     Returns a dict of overrides: {group: {param_name: new_value}}
     """
-    st.markdown("### Input Parameters (Point Estimates)")
+    st.markdown("### Input Parameters")
     st.caption("Edit values below to update the model outputs. "
                "Defaults are loaded from `data/use_cases.yaml`.")
 

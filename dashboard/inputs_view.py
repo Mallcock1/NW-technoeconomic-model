@@ -26,7 +26,7 @@ def render_inputs(uc_params: dict, slug: str, n_preview: int = 10000) -> dict:
 
     Returns a dict of overrides: {group: {param_name: new_value_or_dict}}
     """
-    st.markdown("### Input Parameter Distributions")
+    st.markdown("### Input Parameters")
     st.caption("Edit distribution type, parameters, and base value below. "
                "Changes update the Monte Carlo outputs. "
                "To persist changes, edit `data/use_cases.yaml`.")

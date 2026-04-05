@@ -23,7 +23,7 @@ def _chart_layout(**kwargs):
 
 def render_temporal_point(time_series: dict, selected_slug: str, required_margin: float):
     """Render time-dependent point estimate results."""
-    st.markdown("## Time-Dependent Analysis (Point Estimates)")
+    st.markdown("## Time-Dependent Analysis")
     st.caption("Shows how model outputs evolve as time-dependent parameters "
                "(e.g. launch cost) change over the selected year range.")
 
@@ -84,7 +84,7 @@ def render_temporal_point(time_series: dict, selected_slug: str, required_margin
 
 def render_temporal_mc(time_series: dict, selected_slug: str, required_margin: float):
     """Render time-dependent MC results for all use cases."""
-    st.markdown("## Time-Dependent Analysis (Monte Carlo)")
+    st.markdown("## Time-Dependent Analysis")
     st.caption("Shows how MC outputs evolve as time-dependent parameters change. "
                "P(viable) reflects the fraction of simulations beating the required margin.")
 

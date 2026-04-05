@@ -236,8 +236,8 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
     required_margin = settings["required_margin"]
     selected_slug = settings["selected_slug"]
 
-    st.markdown("## Point Estimate Results")
-    st.caption("Deterministic evaluation using base (mode) values for all parameters. No uncertainty.")
+    st.markdown("## Overview")
+    st.caption("Deterministic evaluation using base values for all parameters.")
 
     # Compute all point estimates
     estimates = {}
