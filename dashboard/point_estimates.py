@@ -104,9 +104,6 @@ def _compute_point_estimate(uc_params: dict, global_params: dict, required_margi
     else:
         breakeven_price = None
 
-    # TX cost (for portfolio analysis)
-    tx_total = tx_hw + tx_mass * launch_cost
-
     return {
         "slug": slug,
         "name": meta["name"],
@@ -350,36 +347,43 @@ def render_point_estimates(use_cases: dict, global_params: dict, settings: dict)
         st.metric("Cost/W", f"${e['cost_per_W']:,.0f}")
 
     # Cost waterfall
-    st.markdown("#### Cost Breakdown")
-    launch_cost = get_param_value(uc.get("economic", {}).get("launch_cost_per_kg", {"value": 5000}))
+    st.markdown("#### NEOWATT Cost Breakdown")
+    lc = get_param_value(uc.get("economic", {}).get("launch_cost_per_kg", {"value": 5000}))
     cost_data = uc.get("cost", {})
 
     items = []
     vals = []
+    colors = []
 
-    tx_hw = get_param_value(cost_data.get("tx_hardware_k", {"value": 0})) * 1000
-    items.append("TX Hardware"); vals.append(tx_hw)
+    tx_hw_val = get_param_value(cost_data.get("tx_hardware_k", {"value": 0})) * 1000
+    items.append("TX Manufacturing"); vals.append(tx_hw_val); colors.append(COLORS["primary"])
 
-    rx_hw = get_param_value(cost_data.get("rx_hardware_k", {"value": 0})) * 1000
-    items.append("RX Hardware"); vals.append(rx_hw)
+    rx_hw_val = get_param_value(cost_data.get("rx_hardware_k", {"value": 0})) * 1000
+    if rx_hw_val > 0:
+        items.append("RX Manufacturing"); vals.append(rx_hw_val); colors.append(COLORS["primary"])
 
-    tx_launch = get_param_value(cost_data.get("tx_mass_kg", {"value": 0})) * launch_cost
-    items.append("TX Launch"); vals.append(tx_launch)
+    # Only show launch costs for service models (NEOWATT pays launch)
+    if not is_hardware_sale:
+        tx_launch_val = get_param_value(cost_data.get("tx_mass_kg", {"value": 0})) * lc
+        items.append("TX Launch"); vals.append(tx_launch_val); colors.append(COLORS["primary"])
 
-    rx_launch = get_param_value(cost_data.get("rx_mass_kg", {"value": 0})) * launch_cost
-    items.append("RX Launch"); vals.append(rx_launch)
+        rx_mass_val = get_param_value(cost_data.get("rx_mass_kg", {"value": 0}))
+        rx_launch_val = rx_mass_val * lc
+        if rx_launch_val > 0:
+            items.append("RX Launch"); vals.append(rx_launch_val); colors.append(COLORS["primary"])
 
-    ground = get_param_value(cost_data.get("ground_segment_k", {"value": 0})) * 1000
-    items.append("Ground Segment"); vals.append(ground)
+    ground_val = get_param_value(cost_data.get("ground_segment_k", {"value": 0})) * 1000
+    items.append("Ground Segment"); vals.append(ground_val); colors.append(COLORS["primary"])
 
     opex_total = e["opex_yr"] * e["amort_years"]
     items.append(f"Total OPEX\n({e['amort_years']:.0f}yr lifetime)")
     vals.append(opex_total)
+    colors.append(COLORS["marginal"])
 
     fig = go.Figure(go.Bar(
         x=items,
         y=[v / 1000 for v in vals],
-        marker_color=[COLORS["primary"]] * (len(vals) - 1) + [COLORS["marginal"]],
+        marker_color=colors,
         text=[f"${v/1000:.0f}k" for v in vals],
         textposition="outside",
     ))
