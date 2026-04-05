@@ -12,10 +12,11 @@ use_cases:
       category: Power Delivery
       time_horizon: Near-term
       model_class: HardwareSaleModel
-      model_prose: Same hardware sale model. Revenue is TX+RX sale price annualised plus support fees. NEOWATT's costs are
-        manufacturing the ground TX unit and the airborne RX module. No launch costs at all (ground TX is deployed on-site,
-        RX is integrated on the HAPS by the customer). Customer saving compares our hardware cost per watt against the incumbent
-        cost of onboard solar+battery HAPS power systems.
+      model_prose: NEOWATT manufactures a ground-based TX unit and a lightweight airborne RX module, selling both to the HAPS
+        operator. Revenue is the hardware sale price (annualised over the system lifetime) plus an annual support and software
+        licensing fee. NEOWATT's costs are manufacturing and ground support only -- no launch costs, since the TX is ground-based
+        and the customer integrates the RX on their HAPS platform. The customer saving compares the total hardware cost per
+        watt against the incumbent cost of achieving the same power capability via onboard solar arrays and batteries.
       model_maths: '**Annual revenue:**
 
         $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
@@ -99,8 +100,8 @@ use_cases:
         value: 120
         unit: $k
         description: Ground-based transmitter cost
-        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial
-          laser + tracking system. $60-250k.
+        justification: Ground-based means no space qualification needed – major cost reduction vs orbital TX. Commercial laser
+          + tracking system. $60-250k.
         distribution:
           type: triangular
           low: 60
@@ -297,10 +298,11 @@ use_cases:
       notion_capabilities:
       - Power during eclipses and anomaly recovery
       - Power resilience after partial degradation or damage
-      model_prose: NEOWATT manufactures and sells TX and RX hardware to the customer. Revenue is the hardware sale price (annualised
-        over the system lifetime) plus an annual support fee. NEOWATT's costs are manufacturing and ground support -- no launch
-        costs (the customer pays for their own launch). The customer saving compares the total hardware cost per watt against
-        the incumbent cost of achieving eclipse power via battery oversizing.
+      model_prose: NEOWATT manufactures and sells a TX payload and RX modules to the customer. Revenue is the hardware sale
+        price (annualised over the system lifetime) plus an annual support and software licensing fee. NEOWATT's costs are
+        manufacturing and ground support only -- no launch costs, since the customer integrates the hardware on their own
+        satellites and pays for their own launch. The customer saving compares the total hardware cost per watt of delivered
+        eclipse power against the incumbent cost of battery oversizing and extra solar panels.
       model_maths: '**Annual revenue:**
 
         $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
@@ -603,9 +605,10 @@ use_cases:
       notion_capabilities:
       - Higher peak power on demand
       - Purchase power during high-demand phases
-      model_prose: Same hardware sale model as LEO Duty Cycle Extension. Revenue is TX+RX sale price annualised plus support
-        fees. NEOWATT's costs are manufacturing only. The customer saving compares our hardware cost per watt-peak against
-        the incumbent cost of oversizing arrays and batteries for peak demand.
+      model_prose: NEOWATT manufactures and sells a TX payload and RX modules to the customer. Revenue is the hardware sale
+        price (annualised over the system lifetime) plus an annual support fee. NEOWATT's costs are manufacturing and ground
+        support only -- the customer pays for their own launch. The customer saving compares the total hardware cost per watt-peak
+        against the incumbent cost of oversizing solar arrays and batteries to handle peak demand events.
       model_maths: '**Annual revenue:**
 
         $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
@@ -888,9 +891,11 @@ use_cases:
       model_class: LifeExtensionModel
       notion_capabilities:
       - Extension of satellite operational lifetimes
-      model_prose: Revenue is a flat annual service fee per satellite served. The customer saving compares our annual fee
-        against the incumbent alternative (Northrop Grumman MEV docking service at ~$13M/yr, or a full replacement satellite).
-        CAPEX covers the GEO-rated transmitter, receiver, and ground infrastructure.
+      model_prose: 'NEOWATT operates its own TX satellite, co-located in GEO with the ageing customer satellite. Revenue is
+        a flat annual service fee per satellite served. NEOWATT bears the full CAPEX: TX and RX hardware, launch costs for
+        both, and ground segment infrastructure. The customer saving compares NEOWATT''s annual service fee against the incumbent
+        alternative -- either a Northrop Grumman MEV docking contract at ~$13M/yr or the amortised cost of a full replacement
+        satellite.'
       model_maths: '**Annual revenue:**
 
         $$R = P_{service}$$
@@ -1143,9 +1148,11 @@ use_cases:
       category: Power Delivery
       time_horizon: Mid-term
       model_class: HardwareSaleModel
-      model_prose: Hardware sale model. NEOWATT sells TX for the host structure and RX modules for each robot. Revenue is
-        sale prices annualised plus support fees. Customer saving compares our hardware cost per watt against the cost of
-        onboard solar+battery on each robot or power cabling infrastructure.
+      model_prose: NEOWATT manufactures and sells a TX unit (for the host spacecraft or structure) and RX modules (for each
+        robot or vehicle). Revenue is the hardware sale price (annualised over the system lifetime) plus an annual support
+        fee. NEOWATT's costs are manufacturing and ground support only -- the customer integrates the hardware and pays for
+        their own launch. The customer saving compares the total hardware cost per watt against the incumbent cost of equipping
+        each robot with its own solar arrays and batteries, or running power cabling along the structure.
       model_maths: '**Annual revenue:**
 
         $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
@@ -1416,9 +1423,11 @@ use_cases:
       - Reduced drag and collision risk
       - Reduced need for Sun-pointing
       - Improved pointing stability
-      model_prose: 'Hardware sale model. NEOWATT sells TX+RX to the customer. Revenue is the sale price annualised plus support
-        fees. The customer saving is measured per kg of solar array mass removed: our RX cost per kg saved vs the incumbent
-        solar array cost per kg.'
+      model_prose: 'NEOWATT manufactures and sells a TX payload and RX modules to the customer, who integrates them at the
+        satellite design phase. Revenue is the hardware sale price (annualised over the system lifetime) plus an annual support
+        fee. NEOWATT''s costs are manufacturing and ground support only. The customer saving is measured per kilogram of solar
+        array mass removed: the cost of our RX module per kg of mass saved, compared against the incumbent cost per kg of
+        deployable solar array hardware it replaces.'
       model_maths: '**Annual revenue:**
 
         $$R = \frac{S_{tx} + S_{rx}}{Y} + F_{support}$$
@@ -1700,9 +1709,11 @@ use_cases:
       - Shift from CAPEX to OPEX for power
       - Decoupling power generation from spacecraft
       - Sale of surplus power by generators
-      model_prose: Revenue is the subscription price times the number of customers served by one TX platform. CAPEX includes
-        the TX platform plus one RX module per customer (both hardware and launch). The customer saving compares the total
-        subscription cost over the system lifetime against the solar array CAPEX the customer avoids.
+      model_prose: 'NEOWATT operates a multi-customer TX satellite in LEO and sells power subscriptions. Revenue is the annual
+        subscription price per customer multiplied by the number of customers served by one TX platform. NEOWATT bears the
+        full CAPEX: the TX platform, one RX module per customer (both hardware and launch for each), and ground segment infrastructure.
+        The customer saving compares the total subscription cost over the system lifetime against the solar array and battery
+        CAPEX the customer avoids by subscribing.'
       model_maths: '**Annual revenue (per TX platform):**
 
         $$R = P_{sub} \times N_{cust}$$
@@ -1953,9 +1964,11 @@ use_cases:
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
-      model_prose: Same model structure as LEO Duty Cycle Extension. Revenue from price per watt times power delivered, adjusted
-        for the night fraction (~50% for lunar day/night cycle) and availability. Very high WTP due to scarcity of alternatives.
-        The customer saving compares our price against the cost of RTGs or the economic value lost from mission hibernation.
+      model_prose: 'NEOWATT operates a TX satellite on a lunar orbiter or crater-rim relay station. Revenue is a price per
+        watt of delivered power, adjusted for the night fraction (~50% for the 14-day lunar night cycle) and system availability.
+        NEOWATT bears the full CAPEX: TX and RX hardware, launch costs for both, and ground segment. The customer saving compares
+        NEOWATT''s price per watt against the incumbent cost of RTGs or the economic value lost from mission hibernation during
+        lunar night.'
       model_maths: '**Annual revenue:**
 
         $$R = P \times W \times d \times a$$
@@ -2200,9 +2213,11 @@ use_cases:
       time_horizon: Mid-term
       model_class: DebrisAblationModel
       incumbent_type: greenfield
-      model_prose: Revenue is the price per debris object removed times the number of objects engaged per year. There is no
-        receiver hardware or launch cost (the target is uncooperative debris). This is a greenfield market with no direct
-        incumbent, so viability is assessed by whether the NPV is positive rather than by beating an incumbent price.
+      model_prose: 'NEOWATT operates a high-power laser satellite in LEO. Revenue is the price per debris object removed multiplied
+        by the number of objects engaged per year. There is no receiver hardware or launch cost -- the target is uncooperative
+        debris. NEOWATT bears all CAPEX: the laser satellite hardware, launch, and ground segment. This is a greenfield market
+        with no direct incumbent to beat, so viability is assessed by whether the net present value is positive rather than
+        by beating an incumbent price.'
       model_maths: '**Annual revenue:**
 
         $$R = W_{obj} \times N_{obj} \times a$$
@@ -2440,9 +2455,11 @@ use_cases:
       category: Power Delivery
       time_horizon: Mid-term
       model_class: StandardPowerModel
-      model_prose: Same model structure as LEO Duty Cycle Extension. Revenue from price per watt times power delivered, adjusted
-        for duty cycle and availability. The key value driver is avoiding the cost of co-locating solar arrays on each payload
-        generation. Over multiple payload refreshes, the cumulative saving from reusing power infrastructure grows.
+      model_prose: 'NEOWATT operates a long-lived solar generation platform in orbit. Revenue is a price per watt of delivered
+        power, adjusted for duty cycle and system availability. NEOWATT bears the full CAPEX: TX platform hardware, RX modules
+        for consumer spacecraft, launch costs for both, and ground segment. The customer saving compares NEOWATT''s price
+        per watt against the cost of co-locating solar arrays on each short-lived payload module that would otherwise be discarded
+        every 3-5 years when the payload is refreshed.'
       model_maths: '**Annual revenue:**
 
         $$R = P \times W \times d \times a$$
@@ -2686,9 +2703,11 @@ use_cases:
       notion_capabilities:
       - Reduced radar cross section
       - Reduced optical reflectivity
-      model_prose: Hardware sale model with defence premium. Revenue is TX+RX sale price multiplied by a defence WTP premium
-        (1.2-4x), annualised, plus support fees. NEOWATT's costs are manufacturing. Customer saving compares our per-spacecraft
-        hardware cost against the incumbent cost of stealth measures (coatings, operational constraints).
+      model_prose: NEOWATT manufactures and sells TX and RX hardware to the defence customer, who integrates and operates
+        it on their own classified spacecraft. Revenue is the hardware sale price multiplied by a defence WTP premium (typically
+        1.2-4x commercial prices), annualised over the system lifetime, plus an annual support fee. NEOWATT's costs are manufacturing
+        and ground support only. The customer saving compares the total per-spacecraft hardware cost against the incumbent
+        cost of current stealth measures (coatings, orbit selection, operational constraints).
       model_maths: '**Annual revenue:**
 
         $$R = \frac{(S_{tx} + S_{rx}) \times k}{Y} + F_{support}$$
